@@ -35,8 +35,8 @@ fprintf("目前从"+startIdx+"开始加载");
 for i=1:length(latest)
     % CSI_data/phase/1/1_1
     idx = startIdx+datasetIndex;
-    folder_mag =  ['CSI_data/mag/p',num2str(samplePoint-1),'/'];
-    folder_phase =  ['CSI_data/phase/p',num2str(samplePoint-1),'/'];
+    folder_mag =  ['../CSI_data/mag/p',num2str(samplePoint-1),'/'];
+    folder_phase =  ['../CSI_data/phase/p',num2str(samplePoint-1),'/'];
 
     if exist(folder_mag)==0
         mkdir(folder_mag); 
@@ -66,6 +66,8 @@ for i=1:length(latest)
 
     Mag = CSIFrame.Mag;
     Phase = CSIFrame.Phase;
+    Mag = Mag(1:1992,:,:);
+    Phase = Phase(1:1992,:,:);
     save(filename_mag, 'Mag');
     save(filename_phase, 'Phase');
 

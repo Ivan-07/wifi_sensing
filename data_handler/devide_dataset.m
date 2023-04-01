@@ -4,7 +4,7 @@ for k=1:2
     string = strings(k);
     for idx=0:34
         % 指定原始文件夹的路径
-        folder_path = 'CSI_data/'+string+'/p'+num2str(idx);
+        folder_path = '../CSI_data/'+string+'/p'+num2str(idx);
         
         % 获取所有.mat文件的列表
         mat_files = dir(fullfile(folder_path, '*.mat'));
@@ -22,8 +22,8 @@ for k=1:2
         split2 = rand_idx(split_idx+1:end);
         
         % 创建两个新的文件夹来保存.mat文件
-        folder1_path = 'MH_data/'+string+'/train/p'+num2str(idx);
-        folder2_path = 'MH_data/'+string+'/test/p'+ num2str(idx);
+        folder1_path = '../MH_data/'+string+'/train/p'+num2str(idx);
+        folder2_path = '../MH_data/'+string+'/test/p'+ num2str(idx);
         if exist(folder1_path)==0
             mkdir(folder1_path); 
         end

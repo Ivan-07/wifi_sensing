@@ -5,7 +5,7 @@ import argparse
 from util import load_data_n_model
 
 
-def train(model, tensor_loader, num_epochs, learning_rate, criterion, device):
+def train(model, tensor_loader, num_epochs, learning_rate, criterion, device, args):
     model = model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     for epoch in range(num_epochs):
@@ -32,10 +32,12 @@ def train(model, tensor_loader, num_epochs, learning_rate, criterion, device):
         epoch_loss = epoch_loss / len(tensor_loader.dataset)
         epoch_accuracy = epoch_accuracy / len(tensor_loader)
         print('Epoch:{}, Accuracy:{:.4f},Loss:{:.9f}'.format(epoch + 1, float(epoch_accuracy), float(epoch_loss)))
+
+        torch.save(model.state_dict(), "./model_pth/"+args.dataset+"_"+args.model+"_model_epoch"+str(epoch)+".pth")
     return
 
 
-def test(model, tensor_loader, criterion, device):
+def test(model, tensor_loader, criterion, device, args):
     model.eval()
     test_acc = 0
     test_loss = 0
@@ -80,13 +82,15 @@ def main():
         num_epochs=train_epoch,
         learning_rate=1e-3,
         criterion=criterion,
-        device=device
+        device=device,
+        args=args
     )
     test(
         model=model,
         tensor_loader=test_loader,
         criterion=criterion,
-        device=device
+        device=device,
+        args=args
     )
     return
 

@@ -1,12 +1,14 @@
 from dataset import *
 from UT_HAR_model import *
 from NTU_Fi_model import *
+from MH_model import *
 from widar_model import *
 from self_supervised_model import *
 import torch
 
+
 def load_data_n_model(dataset_name, model_name, root):
-    classes = {'UT_HAR_data':7,'NTU-Fi-HumanID':14,'NTU-Fi_HAR':6,'Widar':22}
+    classes = {'UT_HAR_data':7,'NTU-Fi-HumanID':14,'NTU-Fi_HAR':6,'Widar':22,'MH_data':35}
     if dataset_name == 'UT_HAR_data':
         print('using dataset: UT-HAR DATA')
         data = UT_HAR_dataset(root)
@@ -59,8 +61,8 @@ def load_data_n_model(dataset_name, model_name, root):
             model = UT_HAR_ViT()
             train_epoch = 200 #100
         return train_loader, test_loader, model, train_epoch
-    
-    
+
+
     elif dataset_name == 'NTU-Fi-HumanID':
         print('using dataset: NTU-Fi-HumanID')
         num_classes = classes['NTU-Fi-HumanID']
@@ -111,8 +113,21 @@ def load_data_n_model(dataset_name, model_name, root):
             model = NTU_Fi_ViT(num_classes=num_classes)
             train_epoch = 50
         return train_loader, test_loader, model, train_epoch
-    
-    
+
+
+    elif dataset_name == "MH_data":
+        print('using dataset: MH_data')
+        num_classes = classes['MH_data']
+
+        modal = 'Phase'
+        train_loader = torch.utils.data.DataLoader(dataset=MH_CSI_Dataset(root + 'MH_data/'+modal.lower()+'/train/', modal=modal), batch_size=64, shuffle=True)
+        test_loader = torch.utils.data.DataLoader(dataset=MH_CSI_Dataset(root + 'MH_data/'+modal.lower()+'/test/', modal=modal), batch_size=64, shuffle=False)
+        if model_name == 'ResNet18':
+            print("using model: ResNet18")
+            model = MH_ResNet18(num_classes)
+            train_epoch = 10
+        return train_loader, test_loader, model, train_epoch
+
     elif dataset_name == 'NTU-Fi_HAR':
         print('using dataset: NTU-Fi_HAR')
         num_classes = classes['NTU-Fi_HAR']
