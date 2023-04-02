@@ -28,6 +28,46 @@ class BasicBlock(nn.Module):
         return out
 
 
+class ResNetBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, stride=1):
+        super(ResNetBlock, self).__init__()
+        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, bias=False)
+        self.bn1 = nn.BatchNorm2d(out_channels)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(out_channels)
+        self.conv3 = nn.Conv2d(out_channels, out_channels * 4, kernel_size=1, bias=False)
+        self.bn3 = nn.BatchNorm2d(out_channels * 4)
+        self.relu = nn.ReLU(inplace=True)
+
+        self.downsample = nn.Sequential()
+        if stride != 1 or in_channels != out_channels * 4:
+            self.downsample = nn.Sequential(
+                nn.Conv2d(in_channels, out_channels * 4, kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(out_channels * 4)
+            )
+
+    def forward(self, x):
+        identity = x
+
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+
+        out = self.conv2(out)
+        out = self.bn2(out)
+        out = self.relu(out)
+
+        out = self.conv3(out)
+        out = self.bn3(out)
+
+        identity = self.downsample(identity)
+
+        out += identity
+        out = self.relu(out)
+
+        return out
+
+
 class MH_ResNet(nn.Module):
     def __init__(self, block, layers, num_classes):
         super(MH_ResNet, self).__init__()
@@ -69,3 +109,7 @@ class MH_ResNet(nn.Module):
 
 def MH_ResNet18(num_classes):
     return MH_ResNet(BasicBlock, [2, 2, 2, 2], num_classes=num_classes)
+
+
+def MH_ResNet50(num_classes):
+    return MH_ResNet(ResNetBlock, [3, 4, 6, 3], num_classes=num_classes)

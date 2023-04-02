@@ -33,9 +33,81 @@ def train(model, tensor_loader, num_epochs, learning_rate, criterion, device, ar
         epoch_accuracy = epoch_accuracy / len(tensor_loader)
         print('Epoch:{}, Accuracy:{:.4f},Loss:{:.9f}'.format(epoch + 1, float(epoch_accuracy), float(epoch_loss)))
 
-        torch.save(model.state_dict(), "./model_pth/"+args.dataset+"_"+args.model+"_model_epoch"+str(epoch)+".pth")
+        if (epoch + 1) % 1 == 0:
+            torch.save(model.state_dict(),
+                       "./model_pth/" + args.model + "/" + args.modal + "/" + args.dataset + "_" + args.model + "_model_epoch" + str(
+                           epoch + 1) + ".pth")
     return
 
+
+def my_test(model, tensor_loader, criterion, device, args):
+    for i in range(1, 21):
+        # 定义路径
+        model_path = "./model_pth/" + args.model + "/" + args.modal + "/" + args.dataset + "_" + args.model + "_model_epoch" + str(
+            i * 10) + ".pth"
+
+        # 加载模型
+        model.load_state_dict(torch.load(model_path))
+
+        model.eval()
+        test_acc = 0
+        test_loss = 0
+        for data in tensor_loader:
+            inputs, labels = data
+            inputs = inputs.to(device)
+            labels.to(device)
+            labels = labels.type(torch.LongTensor)
+
+            outputs = model(inputs)
+            outputs = outputs.type(torch.FloatTensor)
+            outputs.to(device)
+
+            loss = criterion(outputs, labels)
+            predict_y = torch.argmax(outputs, dim=1).to(device)
+            accuracy = (predict_y == labels.to(device)).sum().item() / labels.size(0)
+            test_acc += accuracy
+            test_loss += loss.item() * inputs.size(0)
+        test_acc = test_acc / len(tensor_loader)
+        test_loss = test_loss / len(tensor_loader.dataset)
+        print(
+            args.model + " " + args.modal + " epoch" + str(i * 10) + " test accuracy:{:.4f}, loss:{:.5f}".format(
+                float(test_acc), float(test_loss)))
+    return
+
+
+def my_val(model, tensor_loader, criterion, device, args):
+    for i in range(1, 21):
+        # 定义路径
+        model_path = "./model_pth/" + args.model + "/" + args.modal + "/" + args.dataset + "_" + args.model + "_model_epoch" + str(
+            i * 10) + ".pth"
+
+        # 加载模型
+        model.load_state_dict(torch.load(model_path))
+
+        model.eval()
+        test_acc = 0
+        test_loss = 0
+        for data in tensor_loader:
+            inputs, labels = data
+            inputs = inputs.to(device)
+            labels.to(device)
+            labels = labels.type(torch.LongTensor)
+
+            outputs = model(inputs)
+            outputs = outputs.type(torch.FloatTensor)
+            outputs.to(device)
+
+            loss = criterion(outputs, labels)
+            predict_y = torch.argmax(outputs, dim=1).to(device)
+            accuracy = (predict_y == labels.to(device)).sum().item() / labels.size(0)
+            test_acc += accuracy
+            test_loss += loss.item() * inputs.size(0)
+        test_acc = test_acc / len(tensor_loader)
+        test_loss = test_loss / len(tensor_loader.dataset)
+        print(
+            args.model + " " + args.modal + " epoch" + str(i * 10) + " val accuracy:{:.4f}, loss:{:.5f}".format(
+                float(test_acc), float(test_loss)))
+    return
 
 def test(model, tensor_loader, criterion, device, args):
     model.eval()
@@ -58,7 +130,7 @@ def test(model, tensor_loader, criterion, device, args):
         test_loss += loss.item() * inputs.size(0)
     test_acc = test_acc / len(tensor_loader)
     test_loss = test_loss / len(tensor_loader.dataset)
-    print("validation accuracy:{:.4f}, loss:{:.5f}".format(float(test_acc), float(test_loss)))
+    print(args.model + " " + args.modal + " test accuracy:{:.4f}, loss:{:.5f}".format(float(test_acc), float(test_loss)))
     return
 
 
@@ -69,9 +141,10 @@ def main():
     parser.add_argument('--model',
                         choices=['MLP', 'LeNet', 'ResNet18', 'ResNet50', 'ResNet101', 'RNN', 'GRU', 'LSTM', 'BiLSTM',
                                  'CNN+GRU', 'ViT'])
+    parser.add_argument('--modal', choices=['Mag', 'Phase'])
     args = parser.parse_args()
 
-    train_loader, test_loader, model, train_epoch = load_data_n_model(args.dataset, args.model, root)
+    train_loader, test_loader, val_loader, model, train_epoch = load_data_n_model(args.dataset, args.model, root, args.modal)
     criterion = nn.CrossEntropyLoss()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
@@ -85,9 +158,23 @@ def main():
         device=device,
         args=args
     )
-    test(
+    # test(
+    #     model=model,
+    #     tensor_loader=test_loader,
+    #     criterion=criterion,
+    #     device=device,
+    #     args=args
+    # )
+    my_test(
         model=model,
         tensor_loader=test_loader,
+        criterion=criterion,
+        device=device,
+        args=args
+    )
+    my_val(
+        model=model,
+        tensor_loader=val_loader,
         criterion=criterion,
         device=device,
         args=args

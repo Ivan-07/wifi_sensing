@@ -35,8 +35,13 @@ fprintf("目前从"+startIdx+"开始加载");
 for i=1:length(latest)
     % CSI_data/phase/1/1_1
     idx = startIdx+datasetIndex;
-    folder_mag =  ['../CSI_data/mag/p',num2str(samplePoint-1),'/'];
-    folder_phase =  ['../CSI_data/phase/p',num2str(samplePoint-1),'/'];
+    if sampleIdx == 3
+        folder_mag =  ['../CSI_data/val/Mag/p',num2str(samplePoint-1),'/'];
+        folder_phase =  ['../CSI_data/val/phase/p',num2str(samplePoint-1),'/'];
+    else
+        folder_mag =  ['../CSI_data/Mag/p',num2str(samplePoint-1),'/'];
+        folder_phase =  ['../CSI_data/Phase/p',num2str(samplePoint-1),'/'];
+    end
 
     if exist(folder_mag)==0
         mkdir(folder_mag); 
@@ -46,8 +51,13 @@ for i=1:length(latest)
         mkdir(folder_phase); 
     end
 
-    filename_mag = ['../CSI_data/mag/p',num2str(samplePoint-1),'/p',num2str(samplePoint-1),'_',num2str(idx)];
-    filename_phase = ['../CSI_data/phase/p',num2str(samplePoint-1),'/p',num2str(samplePoint-1),'_',num2str(idx)];
+    if sampleIdx == 3
+        filename_mag = ['../CSI_data/val/Mag/p',num2str(samplePoint-1),'/p',num2str(samplePoint-1),'_',num2str(idx)];
+        filename_phase = ['../CSI_data/val/Phase/p',num2str(samplePoint-1),'/p',num2str(samplePoint-1),'_',num2str(idx)];
+    else
+        filename_mag = ['../CSI_data/Mag/p',num2str(samplePoint-1),'/p',num2str(samplePoint-1),'_',num2str(idx)];
+        filename_phase = ['../CSI_data/Phase/p',num2str(samplePoint-1),'/p',num2str(samplePoint-1),'_',num2str(idx)];
+    end
 
     if (exist(filename_mag) && exist(filename_phase))
         continue
@@ -61,6 +71,10 @@ for i=1:length(latest)
     datasetIndex = datasetIndex+1;
 
     if (idx >= 700)
+        return;
+    end
+
+    if (sampleIdx == 3 && idx >= 300)
         return;
     end
 

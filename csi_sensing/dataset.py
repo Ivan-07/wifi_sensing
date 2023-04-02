@@ -8,14 +8,14 @@ import torch.utils.data as data
 
 
 def UT_HAR_dataset(root_dir):
-    data_list = glob.glob(root_dir+'/UT_HAR/data/*.csv')
-    label_list = glob.glob(root_dir+'/UT_HAR/label/*.csv')
+    data_list = glob.glob(root_dir + '/UT_HAR/data/*.csv')
+    label_list = glob.glob(root_dir + '/UT_HAR/label/*.csv')
     WiFi_data = {}
     for data_dir in data_list:
         data_name = data_dir.split('/')[-1].split('.')[0]
         with open(data_dir, 'rb') as f:
             data = np.load(f)
-            data = data.reshape(len(data),1,250,90)
+            data = data.reshape(len(data), 1, 250, 90)
             data_norm = (data - np.min(data)) / (np.max(data) - np.min(data))
         WiFi_data[data_name] = torch.Tensor(data_norm)
     for label_dir in label_list:
@@ -39,11 +39,11 @@ class CSI_Dataset(Dataset):
                 on a sample.
         """
         self.root_dir = root_dir
-        self.modal=modal
+        self.modal = modal
         self.transform = transform
-        self.data_list = glob.glob(root_dir+'/*/*.mat')
-        self.folder = glob.glob(root_dir+'/*/')
-        self.category = {self.folder[i].split('/')[-2]:i for i in range(len(self.folder))}
+        self.data_list = glob.glob(root_dir + '/*/*.mat')
+        self.folder = glob.glob(root_dir + '/*/')
+        self.category = {self.folder[i].split('/')[-2]: i for i in range(len(self.folder))}
 
     def __len__(self):
         return len(self.data_list)
@@ -51,24 +51,24 @@ class CSI_Dataset(Dataset):
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
-            
+
         sample_dir = self.data_list[idx]
         y = self.category[sample_dir.split('/')[-2]]
         x = sio.loadmat(sample_dir)[self.modal]
-        
+
         # normalize
-        x = (x - 42.3199)/4.9802
-        
+        x = (x - 42.3199) / 4.9802
+
         # sampling: 2000 -> 500
-        x = x[:,::4]
+        x = x[:, ::4]
         x = x.reshape(3, 114, 500)
-        
+
         if self.transform:
             x = self.transform(x)
-        
+
         x = torch.FloatTensor(x)
 
-        return x,y
+        return x, y
 
 
 class MH_CSI_Dataset(Dataset):
@@ -89,7 +89,8 @@ class MH_CSI_Dataset(Dataset):
         self.folder = glob.glob(root_dir + '/*/')
         self.data_list = [path.replace('\\', '/') for path in self.data_list]
         self.folder = [path.replace('\\', '/') for path in self.folder]
-        self.category = {self.folder[i].split('/')[-2]:int(self.folder[i].split('/')[-2][1:])  for i in range(len(self.folder))}
+        self.category = {self.folder[i].split('/')[-2]: int(self.folder[i].split('/')[-2][1:]) for i in
+                         range(len(self.folder))}
 
     def __len__(self):
         return len(self.data_list)
@@ -115,41 +116,36 @@ class MH_CSI_Dataset(Dataset):
         if self.transform:
             x = self.transform(x)
 
-
-
         x = x.float()
-
-
 
         return x, y
 
 
 class Widar_Dataset(Dataset):
-    def __init__(self,root_dir):
+    def __init__(self, root_dir):
         self.root_dir = root_dir
-        self.data_list = glob.glob(root_dir+'/*/*.csv')
-        self.folder = glob.glob(root_dir+'/*/')
-        self.category = {self.folder[i].split('/')[-2]:i for i in range(len(self.folder))}
-        
+        self.data_list = glob.glob(root_dir + '/*/*.csv')
+        self.folder = glob.glob(root_dir + '/*/')
+        self.category = {self.folder[i].split('/')[-2]: i for i in range(len(self.folder))}
+
     def __len__(self):
         return len(self.data_list)
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
-            
+
         sample_dir = self.data_list[idx]
         y = self.category[sample_dir.split('/')[-2]]
         x = np.genfromtxt(sample_dir, delimiter=',')
-        
+
         # normalize
-        x = (x - 0.0025)/0.0119
-        
+        x = (x - 0.0025) / 0.0119
+
         # reshape: 22,400 -> 22,20,20
-        x = x.reshape(22,20,20)
+        x = x.reshape(22, 20, 20)
         # interpolate from 20x20 to 32x32
         # x = self.reshape(x)
         x = torch.FloatTensor(x)
 
-        return x,y
-
+        return x, y

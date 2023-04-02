@@ -171,7 +171,7 @@ class NTU_Fi_ResNet(nn.Module):
 def NTU_Fi_ResNet18(num_classes):
     return NTU_Fi_ResNet(Block, [2,2,2,2], num_classes = num_classes)
 def NTU_Fi_ResNet50(num_classes):
-    return NTU_Fi_ResNet(Bottleneck, [3,4,6,3], num_classes = num_classes)
+    return NTU_Fi_ResNet(Bottleneck, [3, 4, 6, 3], num_classes=num_classes)
     
 def NTU_Fi_ResNet101(num_classes):
     return NTU_Fi_ResNet(Bottleneck, [3,4,23,3], num_classes = num_classes)
