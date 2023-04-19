@@ -1,10 +1,11 @@
 clc;clear all
-strings = ["mag", "phase"];
+strings = ["Mag", "Phase"];
+dataset_len = 5980;
 for k=1:2
     string = strings(k);
-    for idx=0:34
+    for idx=0:24
         % 指定原始文件夹的路径
-        folder_path = '../CSI_data/'+string+'/p'+num2str(idx);
+        folder_path = '../CSI_data/'+string+'/p_'+num2str(idx);
         
         % 获取所有.mat文件的列表
         mat_files = dir(fullfile(folder_path, '*.mat'));
@@ -13,17 +14,17 @@ for k=1:2
         rng(0);
         
         % 生成一个随机的索引序列
-        rand_idx = randperm(length(mat_files));
-        
+%         rand_idx = randperm(length(mat_files));
+        rand_idx = randperm(dataset_len);
         % 将索引序列拆分成两个部分
-        split_ratio = 0.8;
-        split_idx = round(split_ratio * length(mat_files));
+        split_ratio = 0.9;
+        split_idx = round(split_ratio * dataset_len);
         split1 = rand_idx(1:split_idx);
         split2 = rand_idx(split_idx+1:end);
         
         % 创建两个新的文件夹来保存.mat文件
-        folder1_path = '../MH_data/'+string+'/train/p'+num2str(idx);
-        folder2_path = '../MH_data/'+string+'/test/p'+ num2str(idx);
+        folder1_path = '../MH_data/'+string+'/train/p_'+num2str(idx);
+        folder2_path = '../MH_data/'+string+'/test/p_'+ num2str(idx);
         if exist(folder1_path)==0
             mkdir(folder1_path); 
         end

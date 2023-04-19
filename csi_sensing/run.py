@@ -3,12 +3,18 @@ import torch
 import torch.nn as nn
 import argparse
 from util import load_data_n_model
+import os
 
 
 def train(model, tensor_loader, num_epochs, learning_rate, criterion, device, args):
     model = model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     for epoch in range(num_epochs):
+        file_path = "./model_pth/" + args.model + "/" + args.modal + "/" + args.dataset + "_" + args.model + "_model_epoch" + str(
+                           epoch + 1) + ".pth"
+        if os.path.exists(file_path):
+            model.load_state_dict(torch.load(file_path))
+            continue
         model.train()
         epoch_loss = 0
         epoch_accuracy = 0
@@ -33,80 +39,80 @@ def train(model, tensor_loader, num_epochs, learning_rate, criterion, device, ar
         epoch_accuracy = epoch_accuracy / len(tensor_loader)
         print('Epoch:{}, Accuracy:{:.4f},Loss:{:.9f}'.format(epoch + 1, float(epoch_accuracy), float(epoch_loss)))
 
-        if (epoch + 1) % 1 == 0:
-            torch.save(model.state_dict(),
-                       "./model_pth/" + args.model + "/" + args.modal + "/" + args.dataset + "_" + args.model + "_model_epoch" + str(
-                           epoch + 1) + ".pth")
+        if (epoch + 1) % 5 == 0:
+            torch.save(model.state_dict(), file_path)
     return
 
 
 def my_test(model, tensor_loader, criterion, device, args):
-    for i in range(1, 21):
-        # 定义路径
-        model_path = "./model_pth/" + args.model + "/" + args.modal + "/" + args.dataset + "_" + args.model + "_model_epoch" + str(
-            i * 10) + ".pth"
+    folder_path = "./model_pth/" + args.model + "/" + args.modal + "/"
+    # 遍历文件夹
+    for root, dirs, files in os.walk(folder_path):
+        for filename in files:
+            model_path = os.path.join(root, filename)
 
-        # 加载模型
-        model.load_state_dict(torch.load(model_path))
+            # 加载模型
+            model.load_state_dict(torch.load(model_path))
 
-        model.eval()
-        test_acc = 0
-        test_loss = 0
-        for data in tensor_loader:
-            inputs, labels = data
-            inputs = inputs.to(device)
-            labels.to(device)
-            labels = labels.type(torch.LongTensor)
+            model.eval()
+            test_acc = 0
+            test_loss = 0
+            for data in tensor_loader:
+                inputs, labels = data
+                inputs = inputs.to(device)
+                labels.to(device)
+                labels = labels.type(torch.LongTensor)
 
-            outputs = model(inputs)
-            outputs = outputs.type(torch.FloatTensor)
-            outputs.to(device)
+                outputs = model(inputs)
+                outputs = outputs.type(torch.FloatTensor)
+                outputs.to(device)
 
-            loss = criterion(outputs, labels)
-            predict_y = torch.argmax(outputs, dim=1).to(device)
-            accuracy = (predict_y == labels.to(device)).sum().item() / labels.size(0)
-            test_acc += accuracy
-            test_loss += loss.item() * inputs.size(0)
-        test_acc = test_acc / len(tensor_loader)
-        test_loss = test_loss / len(tensor_loader.dataset)
-        print(
-            args.model + " " + args.modal + " epoch" + str(i * 10) + " test accuracy:{:.4f}, loss:{:.5f}".format(
-                float(test_acc), float(test_loss)))
+                loss = criterion(outputs, labels)
+                predict_y = torch.argmax(outputs, dim=1).to(device)
+                accuracy = (predict_y == labels.to(device)).sum().item() / labels.size(0)
+                test_acc += accuracy
+                test_loss += loss.item() * inputs.size(0)
+            test_acc = test_acc / len(tensor_loader)
+            test_loss = test_loss / len(tensor_loader.dataset)
+            print(
+                args.model + " " + args.modal + model_path.split('_')[-1][:-4] + " test accuracy:{:.4f}, loss:{:.5f}".format(
+                    float(test_acc), float(test_loss)))
     return
 
 
 def my_val(model, tensor_loader, criterion, device, args):
-    for i in range(1, 21):
-        # 定义路径
-        model_path = "./model_pth/" + args.model + "/" + args.modal + "/" + args.dataset + "_" + args.model + "_model_epoch" + str(
-            i * 10) + ".pth"
+    folder_path = "./model_pth/" + args.model + "/" + args.modal + "/"
+    # 遍历文件夹
+    for root, dirs, files in os.walk(folder_path):
+        for filename in files:
+            model_path = os.path.join(root, filename)
 
-        # 加载模型
-        model.load_state_dict(torch.load(model_path))
+            # 加载模型
+            model.load_state_dict(torch.load(model_path))
 
-        model.eval()
-        test_acc = 0
-        test_loss = 0
-        for data in tensor_loader:
-            inputs, labels = data
-            inputs = inputs.to(device)
-            labels.to(device)
-            labels = labels.type(torch.LongTensor)
+            model.eval()
+            test_acc = 0
+            test_loss = 0
+            for data in tensor_loader:
+                inputs, labels = data
+                inputs = inputs.to(device)
+                labels.to(device)
+                labels = labels.type(torch.LongTensor)
 
-            outputs = model(inputs)
-            outputs = outputs.type(torch.FloatTensor)
-            outputs.to(device)
+                outputs = model(inputs)
+                outputs = outputs.type(torch.FloatTensor)
+                outputs.to(device)
 
-            loss = criterion(outputs, labels)
-            predict_y = torch.argmax(outputs, dim=1).to(device)
-            accuracy = (predict_y == labels.to(device)).sum().item() / labels.size(0)
-            test_acc += accuracy
-            test_loss += loss.item() * inputs.size(0)
-        test_acc = test_acc / len(tensor_loader)
-        test_loss = test_loss / len(tensor_loader.dataset)
-        print(
-            args.model + " " + args.modal + " epoch" + str(i * 10) + " val accuracy:{:.4f}, loss:{:.5f}".format(
-                float(test_acc), float(test_loss)))
+                loss = criterion(outputs, labels)
+                predict_y = torch.argmax(outputs, dim=1).to(device)
+                accuracy = (predict_y == labels.to(device)).sum().item() / labels.size(0)
+                test_acc += accuracy
+                test_loss += loss.item() * inputs.size(0)
+            test_acc = test_acc / len(tensor_loader)
+            test_loss = test_loss / len(tensor_loader.dataset)
+            print(
+                args.model + " " + args.modal + model_path.split('_')[-1][:-4] + " val accuracy:{:.4f}, loss:{:.5f}".format(
+                    float(test_acc), float(test_loss)))
     return
 
 def test(model, tensor_loader, criterion, device, args):

@@ -1,11 +1,10 @@
-function datasetIndex = extractData(path, sampleIdx, samplePoint, startIdx)
+function idx = extractData(path, samplePoint, people_idx)
 
 latest = opencsi(path);
 
-datasetIndex = 0;
+idx = 0;
 
  
-
 % %% 数据格式：JSON格式：{感兴趣的内容(固定不变的部分)+(时间戳、CSI信息)}
 % 
 % % 提取出固定的部分
@@ -29,19 +28,12 @@ datasetIndex = 0;
 %     end
 % end
 
-fprintf("目前从"+startIdx+"开始加载");
 
 
 for i=1:length(latest)
-    % CSI_data/phase/1/1_1
-    idx = startIdx+datasetIndex;
-    if sampleIdx == 3
-        folder_mag =  ['../CSI_data/val/Mag/p',num2str(samplePoint-1),'/'];
-        folder_phase =  ['../CSI_data/val/phase/p',num2str(samplePoint-1),'/'];
-    else
-        folder_mag =  ['../CSI_data/Mag/p',num2str(samplePoint-1),'/'];
-        folder_phase =  ['../CSI_data/Phase/p',num2str(samplePoint-1),'/'];
-    end
+
+    folder_mag =  ['../CSI_data/val/Mag/p_',num2str(samplePoint),'/'];
+    folder_phase =  ['../CSI_data/val/Phase/p_',num2str(samplePoint),'/'];
 
     if exist(folder_mag)==0
         mkdir(folder_mag); 
@@ -51,13 +43,8 @@ for i=1:length(latest)
         mkdir(folder_phase); 
     end
 
-    if sampleIdx == 3
-        filename_mag = ['../CSI_data/val/Mag/p',num2str(samplePoint-1),'/p',num2str(samplePoint-1),'_',num2str(idx)];
-        filename_phase = ['../CSI_data/val/Phase/p',num2str(samplePoint-1),'/p',num2str(samplePoint-1),'_',num2str(idx)];
-    else
-        filename_mag = ['../CSI_data/Mag/p',num2str(samplePoint-1),'/p',num2str(samplePoint-1),'_',num2str(idx)];
-        filename_phase = ['../CSI_data/Phase/p',num2str(samplePoint-1),'/p',num2str(samplePoint-1),'_',num2str(idx)];
-    end
+    filename_mag = ['../CSI_data/val/Mag/p_',num2str(samplePoint),'/p_',num2str(samplePoint),'_',num2str(people_idx),'_',num2str(idx)];
+    filename_phase = ['../CSI_data/val/Phase/p_',num2str(samplePoint),'/p_',num2str(samplePoint),'_',num2str(people_idx),'_',num2str(idx)];
 
     if (exist(filename_mag) && exist(filename_phase))
         continue
@@ -68,15 +55,8 @@ for i=1:length(latest)
     if CBW ~= 160
         continue
     end
-    datasetIndex = datasetIndex+1;
+    idx = idx+1;
 
-    if (idx >= 700)
-        return;
-    end
-
-    if (sampleIdx == 3 && idx >= 300)
-        return;
-    end
 
     Mag = CSIFrame.Mag;
     Phase = CSIFrame.Phase;
@@ -88,7 +68,7 @@ for i=1:length(latest)
 %     fclose('all');
 
 end
-
+1
 
 
 

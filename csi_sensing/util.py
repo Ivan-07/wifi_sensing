@@ -120,7 +120,7 @@ def load_data_n_model(dataset_name, model_name, root, modal='Phase'):
 
 
     elif dataset_name == "MH_data":
-        print('using dataset: MH_data')
+        print('using dataset: MH_data '+modal)
         num_classes = classes['MH_data']
 
         train_loader = torch.utils.data.DataLoader(
@@ -132,11 +132,11 @@ def load_data_n_model(dataset_name, model_name, root, modal='Phase'):
         if model_name == 'ResNet18':
             print("using model: ResNet18")
             model = MH_ResNet18(num_classes)
-            train_epoch = 10
-        elif model_name == 'Resnet50':
-            print('using model: Resnet50')
+            train_epoch = 50
+        elif model_name == 'ResNet50':
+            print('using model: ResNet50')
             model = MH_ResNet50(num_classes)
-            train_epoch = 10
+            train_epoch = 50
         return train_loader, test_loader, val_loader, model, train_epoch
 
     elif dataset_name == 'NTU-Fi_HAR':

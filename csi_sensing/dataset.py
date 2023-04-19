@@ -89,8 +89,9 @@ class MH_CSI_Dataset(Dataset):
         self.folder = glob.glob(root_dir + '/*/')
         self.data_list = [path.replace('\\', '/') for path in self.data_list]
         self.folder = [path.replace('\\', '/') for path in self.folder]
-        self.category = {self.folder[i].split('/')[-2]: int(self.folder[i].split('/')[-2][1:]) for i in
+        self.category = {self.folder[i].split('/')[-2]: int(self.folder[i].split('/')[-2][2:]) for i in
                          range(len(self.folder))}
+        1
 
     def __len__(self):
         return len(self.data_list)
