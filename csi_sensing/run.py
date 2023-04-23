@@ -11,42 +11,45 @@ def train(model, tensor_loader, num_epochs, learning_rate, criterion, device, ar
     model = model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     file_path = './output/train_' + args.model+'_'+args.modal + '.txt'
-    for epoch in range(num_epochs):
-        folder = "./model_pth/" + args.model + "/" + args.modal
-        if not os.path.exists(folder):
-            os.makedirs(folder)
+    with open(file_path, 'w') as f:
+        for epoch in range(num_epochs):
+            folder = "./model_pth/" + args.model + "/" + args.modal
+            if not os.path.exists(folder):
+                os.makedirs(folder)
 
-        file_path = "./model_pth/" + args.model + "/" + args.modal + "/" + args.dataset + "_" + args.model + "_model_epoch" + str(
-                           epoch + 1) + ".pth"
-        if os.path.exists(file_path):
-            model.load_state_dict(torch.load(file_path))
-            continue
-        model.train()
-        epoch_loss = 0
-        epoch_accuracy = 0
-        for data in tensor_loader:
-            inputs, labels = data
-            inputs = inputs.to(device)
-            labels = labels.to(device)
-            labels = labels.type(torch.LongTensor)
+            file_path = "./model_pth/" + args.model + "/" + args.modal + "/" + args.dataset + "_" + args.model + "_model_epoch" + str(
+                               epoch + 1) + ".pth"
+            if os.path.exists(file_path):
+                model.load_state_dict(torch.load(file_path))
+                continue
+            model.train()
+            epoch_loss = 0
+            epoch_accuracy = 0
+            for data in tensor_loader:
+                inputs, labels = data
+                inputs = inputs.to(device)
+                labels = labels.to(device)
+                labels = labels.type(torch.LongTensor)
 
-            optimizer.zero_grad()
-            outputs = model(inputs)
-            outputs = outputs.to(device)
-            outputs = outputs.type(torch.FloatTensor)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
+                optimizer.zero_grad()
+                outputs = model(inputs)
+                outputs = outputs.to(device)
+                outputs = outputs.type(torch.FloatTensor)
+                loss = criterion(outputs, labels)
+                loss.backward()
+                optimizer.step()
 
-            epoch_loss += loss.item() * inputs.size(0)
-            predict_y = torch.argmax(outputs, dim=1).to(device)
-            epoch_accuracy += (predict_y == labels.to(device)).sum().item() / labels.size(0)
-        epoch_loss = epoch_loss / len(tensor_loader.dataset)
-        epoch_accuracy = epoch_accuracy / len(tensor_loader)
-        print('Epoch:{}, Accuracy:{:.4f},Loss:{:.9f}'.format(epoch + 1, float(epoch_accuracy), float(epoch_loss)))
+                epoch_loss += loss.item() * inputs.size(0)
+                predict_y = torch.argmax(outputs, dim=1).to(device)
+                epoch_accuracy += (predict_y == labels.to(device)).sum().item() / labels.size(0)
+            epoch_loss = epoch_loss / len(tensor_loader.dataset)
+            epoch_accuracy = epoch_accuracy / len(tensor_loader)
+            res = 'Epoch:{}, Accuracy:{:.4f},Loss:{:.9f}'.format(epoch + 1, float(epoch_accuracy), float(epoch_loss))
+            print(res)
+            f.write(res + '\n')
 
-        if (epoch + 1) % 1 == 0:
-            torch.save(model.state_dict(), file_path)
+            if (epoch + 1) % 1 == 0:
+                torch.save(model.state_dict(), file_path)
     return
 
 
@@ -84,7 +87,7 @@ def my_test(model, tensor_loader, criterion, device, args):
                     test_loss += loss.item() * inputs.size(0)
                 test_acc = test_acc / len(tensor_loader)
                 test_loss = test_loss / len(tensor_loader.dataset)
-                res = args.model + " " + args.modal + model_path.split('_')[-1][:-4] + " test accuracy:{:.4f}, loss:{:.5f}".format(
+                res = args.model + " " + args.modal + " " + model_path.split('_')[-1][:-4] + " test accuracy:{:.4f}, loss:{:.5f}".format(
                         float(test_acc), float(test_loss))
                 print(res)
                 f.write(res + '\n')
@@ -189,13 +192,13 @@ def main():
     #     device=device,
     #     args=args
     # )
-    # my_test(
-    #     model=model,
-    #     tensor_loader=test_loader,
-    #     criterion=criterion,
-    #     device=device,
-    #     args=args
-    # )
+    my_test(
+        model=model,
+        tensor_loader=test_loader,
+        criterion=criterion,
+        device=device,
+        args=args
+    )
     my_val(
         model=model,
         tensor_loader=val_loader,
@@ -207,5 +210,4 @@ def main():
 
 
 if __name__ == "__main__":
-    print(torch.__version__)
     main()
