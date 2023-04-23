@@ -10,6 +10,7 @@ def train(model, tensor_loader, num_epochs, learning_rate, criterion, device, ar
     print("-------------------------------")
     model = model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    file_path = './output/train_' + args.model+'_'+args.modal + '.txt'
     for epoch in range(num_epochs):
         folder = "./model_pth/" + args.model + "/" + args.modal
         if not os.path.exists(folder):
@@ -55,7 +56,7 @@ def my_test(model, tensor_loader, criterion, device, args):
     # 遍历文件夹
     for root, dirs, files in os.walk(folder_path):
         files = sorted(files, key=lambda x: int(x.split('_epoch')[-1].split('.')[0]))
-        file_path = './output/test_' + args.val + '.txt'
+        file_path = './output/test_' + args.model+'_'+args.modal + '.txt'
         with open(file_path, 'w') as f:
             for filename in files:
                 model_path = os.path.join(root, filename)
@@ -97,7 +98,7 @@ def my_val(model, tensor_loader, criterion, device, args):
     # 遍历文件夹
     for root, dirs, files in os.walk(folder_path):
         files = sorted(files, key=lambda x: int(x.split('_epoch')[-1].split('.')[0]))
-        file_path = './output/val_'+args.val+'.txt'
+        file_path = './output/val_'+args.val+'_'+args.model+'_'+args.modal+'.txt'
         with open(file_path, 'w') as f:
             for filename in files:
                 model_path = os.path.join(root, filename)
