@@ -32,8 +32,8 @@ idx = 0;
 
 for i=1:length(latest)
 
-    folder_mag =  ['../CSI_data/val/Mag/p_',num2str(samplePoint),'/'];
-    folder_phase =  ['../CSI_data/val/Phase/p_',num2str(samplePoint),'/'];
+    folder_mag =  ['../CSI_data/val_medium/Mag/p_',num2str(samplePoint),'/'];
+    folder_phase =  ['../CSI_data/val_medium/Phase/p_',num2str(samplePoint),'/'];
 
     if exist(folder_mag)==0
         mkdir(folder_mag); 
@@ -43,8 +43,8 @@ for i=1:length(latest)
         mkdir(folder_phase); 
     end
 
-    filename_mag = ['../CSI_data/val/Mag/p_',num2str(samplePoint),'/p_',num2str(samplePoint),'_',num2str(people_idx),'_',num2str(idx)];
-    filename_phase = ['../CSI_data/val/Phase/p_',num2str(samplePoint),'/p_',num2str(samplePoint),'_',num2str(people_idx),'_',num2str(idx)];
+    filename_mag = ['../CSI_data/val_medium/Mag/p_',num2str(samplePoint),'/p_',num2str(samplePoint),'_',num2str(people_idx),'_',num2str(idx)];
+    filename_phase = ['../CSI_data/val_medium/Phase/p_',num2str(samplePoint),'/p_',num2str(samplePoint),'_',num2str(people_idx),'_',num2str(idx)];
 
     if (exist(filename_mag) && exist(filename_phase))
         continue

@@ -7,7 +7,7 @@ from self_supervised_model import *
 import torch
 
 
-def load_data_n_model(dataset_name, model_name, root, modal='Phase'):
+def load_data_n_model(dataset_name, model_name, root, modal='Phase', val='easy'):
     classes = {'UT_HAR_data': 7, 'NTU-Fi-HumanID': 14, 'NTU-Fi_HAR': 6, 'Widar': 22, 'MH_data': 35}
     if dataset_name == 'UT_HAR_data':
         print('using dataset: UT-HAR DATA')
@@ -128,7 +128,7 @@ def load_data_n_model(dataset_name, model_name, root, modal='Phase'):
         test_loader = torch.utils.data.DataLoader(
             dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/test/', modal=modal), batch_size=64, shuffle=False)
         val_loader = torch.utils.data.DataLoader(
-            dataset=MH_CSI_Dataset(root + 'MH_data/val/' + modal + '/', modal=modal), batch_size=64, shuffle=False)
+            dataset=MH_CSI_Dataset(root + 'MH_data/val_'+val+'/' + modal + '/', modal=modal), batch_size=64, shuffle=False)
         if model_name == 'ResNet18':
             print("using model: ResNet18")
             model = MH_ResNet18(num_classes)

@@ -7,9 +7,14 @@ import os
 
 
 def train(model, tensor_loader, num_epochs, learning_rate, criterion, device, args):
+    print("-------------------------------")
     model = model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     for epoch in range(num_epochs):
+        folder = "./model_pth/" + args.model + "/" + args.modal
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
         file_path = "./model_pth/" + args.model + "/" + args.modal + "/" + args.dataset + "_" + args.model + "_model_epoch" + str(
                            epoch + 1) + ".pth"
         if os.path.exists(file_path):
@@ -39,12 +44,13 @@ def train(model, tensor_loader, num_epochs, learning_rate, criterion, device, ar
         epoch_accuracy = epoch_accuracy / len(tensor_loader)
         print('Epoch:{}, Accuracy:{:.4f},Loss:{:.9f}'.format(epoch + 1, float(epoch_accuracy), float(epoch_loss)))
 
-        if (epoch + 1) % 5 == 0:
+        if (epoch + 1) % 1 == 0:
             torch.save(model.state_dict(), file_path)
     return
 
 
 def my_test(model, tensor_loader, criterion, device, args):
+    print("-------------------------------")
     folder_path = "./model_pth/" + args.model + "/" + args.modal + "/"
     # 遍历文件夹
     for root, dirs, files in os.walk(folder_path):
@@ -81,6 +87,8 @@ def my_test(model, tensor_loader, criterion, device, args):
 
 
 def my_val(model, tensor_loader, criterion, device, args):
+    print("-------------------------------")
+    print("val: "+args.val)
     folder_path = "./model_pth/" + args.model + "/" + args.modal + "/"
     # 遍历文件夹
     for root, dirs, files in os.walk(folder_path):
@@ -111,7 +119,7 @@ def my_val(model, tensor_loader, criterion, device, args):
             test_acc = test_acc / len(tensor_loader)
             test_loss = test_loss / len(tensor_loader.dataset)
             print(
-                args.model + " " + args.modal + model_path.split('_')[-1][:-4] + " val accuracy:{:.4f}, loss:{:.5f}".format(
+                args.model + " " + args.modal + " " + model_path.split('_')[-1][:-4] + " val accuracy:{:.4f}, loss:{:.5f}".format(
                     float(test_acc), float(test_loss)))
     return
 
@@ -148,22 +156,23 @@ def main():
                         choices=['MLP', 'LeNet', 'ResNet18', 'ResNet50', 'ResNet101', 'RNN', 'GRU', 'LSTM', 'BiLSTM',
                                  'CNN+GRU', 'ViT'])
     parser.add_argument('--modal', choices=['Mag', 'Phase'])
+    parser.add_argument('--val', choices=['easy', 'medium', 'hard'])
     args = parser.parse_args()
 
-    train_loader, test_loader, val_loader, model, train_epoch = load_data_n_model(args.dataset, args.model, root, args.modal)
+    train_loader, test_loader, val_loader, model, train_epoch = load_data_n_model(args.dataset, args.model, root, args.modal, args.val)
     criterion = nn.CrossEntropyLoss()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
-    train(
-        model=model,
-        tensor_loader=train_loader,
-        num_epochs=train_epoch,
-        learning_rate=1e-3,
-        criterion=criterion,
-        device=device,
-        args=args
-    )
+    # train(
+    #     model=model,
+    #     tensor_loader=train_loader,
+    #     num_epochs=train_epoch,
+    #     learning_rate=1e-3,
+    #     criterion=criterion,
+    #     device=device,
+    #     args=args
+    # )
     # test(
     #     model=model,
     #     tensor_loader=test_loader,
@@ -171,13 +180,13 @@ def main():
     #     device=device,
     #     args=args
     # )
-    my_test(
-        model=model,
-        tensor_loader=test_loader,
-        criterion=criterion,
-        device=device,
-        args=args
-    )
+    # my_test(
+    #     model=model,
+    #     tensor_loader=test_loader,
+    #     criterion=criterion,
+    #     device=device,
+    #     args=args
+    # )
     my_val(
         model=model,
         tensor_loader=val_loader,

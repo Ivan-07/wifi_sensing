@@ -64,7 +64,7 @@ clc;clear;
 % end
 
 
-folder = './val_data';
+folder = './val_medium';
 sub_files = dir(folder);
 
 for j=1:length(sub_files)
