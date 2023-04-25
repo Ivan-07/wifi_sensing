@@ -1,6 +1,6 @@
 clc;clear all
 strings = ["Mag", "Phase"];
-dataset_len = 5980;
+dataset_len = 580;
 for k=1:2
     string = strings(k);
     for idx=0:24

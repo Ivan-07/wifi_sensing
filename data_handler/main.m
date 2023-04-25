@@ -20,8 +20,8 @@ clc;clear;
 %    sub_files = dir(folder_path);
 % 
 %    position_idx = 0;
-%    for j=1:length(sub_files)
-% %    for j = 25:27
+% %    for j=1:length(sub_files)
+%    for j = 17:27
 %       if strcmp(sub_files(j).name,'.') || strcmp(sub_files(j).name,'..')
 %         continue;
 %       end
@@ -64,7 +64,7 @@ clc;clear;
 % end
 
 
-folder = './val_medium';
+folder = './val_easy';
 sub_files = dir(folder);
 
 for j=1:length(sub_files)

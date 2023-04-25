@@ -19,9 +19,9 @@ def train(model, tensor_loader, num_epochs, learning_rate, criterion, device, ar
 
             file_path = "./model_pth/" + args.model + "/" + args.modal + "/" + args.dataset + "_" + args.model + "_model_epoch" + str(
                                epoch + 1) + ".pth"
-            if os.path.exists(file_path):
-                model.load_state_dict(torch.load(file_path))
-                continue
+            # if os.path.exists(file_path):
+            #     model.load_state_dict(torch.load(file_path))
+            #     continue
             model.train()
             epoch_loss = 0
             epoch_accuracy = 0
@@ -166,7 +166,7 @@ def main():
     parser.add_argument('--dataset', choices=['UT_HAR_data', 'NTU-Fi-HumanID', 'NTU-Fi_HAR', 'Widar', 'MH_data'])
     parser.add_argument('--model',
                         choices=['MLP', 'LeNet', 'ResNet18', 'ResNet50', 'ResNet101', 'RNN', 'GRU', 'LSTM', 'BiLSTM',
-                                 'CNN+GRU', 'ViT'])
+                                 'CNN+GRU', 'ViT', 'EfficientNet'])
     parser.add_argument('--modal', choices=['Mag', 'Phase'])
     parser.add_argument('--val', choices=['easy', 'medium', 'hard'])
     args = parser.parse_args()
@@ -192,13 +192,13 @@ def main():
     #     device=device,
     #     args=args
     # )
-    my_test(
-        model=model,
-        tensor_loader=test_loader,
-        criterion=criterion,
-        device=device,
-        args=args
-    )
+    # my_test(
+    #     model=model,
+    #     tensor_loader=test_loader,
+    #     criterion=criterion,
+    #     device=device,
+    #     args=args
+    # )
     my_val(
         model=model,
         tensor_loader=val_loader,

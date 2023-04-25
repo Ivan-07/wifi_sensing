@@ -2,5 +2,6 @@ CSI_data/*
 MH_data/*
 sample_data/
 csi_sensing/Data/*
+csi_sensing/output/*
 csi_sensing/model_pth/*
 data_handler/data/*

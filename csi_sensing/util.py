@@ -137,13 +137,17 @@ def load_data_n_model(dataset_name, model_name, root, modal='Phase', val='easy')
             print('using model: ResNet50')
             model = MH_ResNet50(num_classes)
             train_epoch = 50
+        elif model_name == 'EfficientNet':
+            print('using model: EfficientNet')
+            model = MH_EfficientNet(num_classes)
+            train_epoch = 50
         return train_loader, test_loader, val_loader, model, train_epoch
 
     elif dataset_name == 'NTU-Fi_HAR':
         print('using dataset: NTU-Fi_HAR')
         num_classes = classes['NTU-Fi_HAR']
         train_loader = torch.utils.data.DataLoader(dataset=CSI_Dataset(root + 'NTU-Fi_HAR/train_amp/'), batch_size=64,
-                                                   shuffle=True)
+                                                   shuffle=False)
         test_loader = torch.utils.data.DataLoader(dataset=CSI_Dataset(root + 'NTU-Fi_HAR/test_amp/'), batch_size=64,
                                                   shuffle=False)
         if model_name == 'MLP':

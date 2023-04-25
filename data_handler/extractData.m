@@ -3,7 +3,7 @@ function idx = extractData(path, samplePoint, people_idx)
 latest = opencsi(path);
 
 idx = 0;
-
+batch_size = 10;
  
 % %% 数据格式：JSON格式：{感兴趣的内容(固定不变的部分)+(时间戳、CSI信息)}
 % 
@@ -29,11 +29,12 @@ idx = 0;
 % end
 
 
-
+batch_mag = [];
+batch_phase = [];
 for i=1:length(latest)
 
-    folder_mag =  ['../CSI_data/val_medium/Mag/p_',num2str(samplePoint),'/'];
-    folder_phase =  ['../CSI_data/val_medium/Phase/p_',num2str(samplePoint),'/'];
+    folder_mag =  ['../CSI_data/val_easy/Mag/p_',num2str(samplePoint),'/'];
+    folder_phase =  ['../CSI_data/val_easy/Phase/p_',num2str(samplePoint),'/'];
 
     if exist(folder_mag)==0
         mkdir(folder_mag); 
@@ -43,12 +44,12 @@ for i=1:length(latest)
         mkdir(folder_phase); 
     end
 
-    filename_mag = ['../CSI_data/val_medium/Mag/p_',num2str(samplePoint),'/p_',num2str(samplePoint),'_',num2str(people_idx),'_',num2str(idx)];
-    filename_phase = ['../CSI_data/val_medium/Phase/p_',num2str(samplePoint),'/p_',num2str(samplePoint),'_',num2str(people_idx),'_',num2str(idx)];
+    filename_mag = ['../CSI_data/val_easy/Mag/p_',num2str(samplePoint),'/p_',num2str(samplePoint),'_',num2str(people_idx),'_',num2str(floor(idx/batch_size))];
+    filename_phase = ['../CSI_data/val_easy/Phase/p_',num2str(samplePoint),'/p_',num2str(samplePoint),'_',num2str(people_idx),'_',num2str(floor(idx/batch_size))];
 
-    if (exist(filename_mag) && exist(filename_phase))
-        continue
-    end
+%     if (exist(filename_mag) && exist(filename_phase))
+%         continue
+%     end
     data = latest(i);
     CSIFrame = data{1}.CSI;
     CBW = CSIFrame.CBW;
@@ -62,13 +63,26 @@ for i=1:length(latest)
     Phase = CSIFrame.Phase;
     Mag = Mag(1:1992,:,:);
     Phase = Phase(1:1992,:,:);
-    save(filename_mag, 'Mag');
-    save(filename_phase, 'Phase');
+    Mag = reshape(Mag, [1992, 1, 4]);
+    Phase = reshape(Phase, [1992, 1, 4]);
+
+    batch_mag = [batch_mag, Mag];
+    batch_phase = [batch_phase, Phase];
+
+    if mod(idx, batch_size) == 0
+        Mag = batch_mag;
+        Phase = batch_phase;
+        save(filename_mag, 'Mag');
+        save(filename_phase, 'Phase');
+        batch_mag = [];
+        batch_phase = [];
+    end
 
 %     fclose('all');
 
 end
-1
+
+idx = floor(idx/batch_size);
 
 
 
