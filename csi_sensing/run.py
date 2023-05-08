@@ -176,15 +176,15 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
-    # train(
-    #     model=model,
-    #     tensor_loader=train_loader,
-    #     num_epochs=train_epoch,
-    #     learning_rate=1e-3,
-    #     criterion=criterion,
-    #     device=device,
-    #     args=args
-    # )
+    train(
+        model=model,
+        tensor_loader=train_loader,
+        num_epochs=train_epoch,
+        learning_rate=1e-3,
+        criterion=criterion,
+        device=device,
+        args=args
+    )
     # test(
     #     model=model,
     #     tensor_loader=test_loader,
@@ -192,13 +192,13 @@ def main():
     #     device=device,
     #     args=args
     # )
-    # my_test(
-    #     model=model,
-    #     tensor_loader=test_loader,
-    #     criterion=criterion,
-    #     device=device,
-    #     args=args
-    # )
+    my_test(
+        model=model,
+        tensor_loader=test_loader,
+        criterion=criterion,
+        device=device,
+        args=args
+    )
     my_val(
         model=model,
         tensor_loader=val_loader,

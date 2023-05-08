@@ -64,7 +64,7 @@ clc;clear;
 % end
 
 
-folder = './val_easy';
+folder = './val_hard';
 sub_files = dir(folder);
 
 for j=1:length(sub_files)

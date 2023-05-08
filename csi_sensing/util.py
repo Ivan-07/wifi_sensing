@@ -124,11 +124,11 @@ def load_data_n_model(dataset_name, model_name, root, modal='Phase', val='easy')
         num_classes = classes['MH_data']
 
         train_loader = torch.utils.data.DataLoader(
-            dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/train/', modal=modal), batch_size=64, shuffle=True)
+            dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/train/', modal=modal), batch_size=32, shuffle=True)
         test_loader = torch.utils.data.DataLoader(
-            dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/test/', modal=modal), batch_size=64, shuffle=False)
+            dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/test/', modal=modal), batch_size=32, shuffle=False)
         val_loader = torch.utils.data.DataLoader(
-            dataset=MH_CSI_Dataset(root + 'MH_data/val_'+val+'/' + modal + '/', modal=modal), batch_size=64, shuffle=False)
+            dataset=MH_CSI_Dataset(root + 'MH_data/val_'+val+'/' + modal + '/', modal=modal), batch_size=32, shuffle=False)
         if model_name == 'ResNet18':
             print("using model: ResNet18")
             model = MH_ResNet18(num_classes)

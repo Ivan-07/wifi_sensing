@@ -108,8 +108,8 @@ class MH_CSI_Dataset(Dataset):
 
 
 
-        mean = 1 # np.mean(x, axis=(0, 1, 2))  # 计算均值
-        std = 37 # np.std(x, axis=(0, 1, 2))  # 计算标准差
+        mean = np.mean(x, axis=(0, 1, 2))  # 计算均值
+        std = np.std(x, axis=(0, 1, 2))  # 计算标准差
 
         self.transform = transforms.Compose(
             [
