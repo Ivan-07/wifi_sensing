@@ -230,7 +230,7 @@ def main():
     parser.add_argument('--val', choices=['easy', 'medium', 'hard'])
     args = parser.parse_args()
 
-    models = ["MLP", "LeNet", "ResNet18", "ResNet50", "ResNet101", "RNN", "GRU", "LSTM", "BiLSTM"]
+    models = ["ResNet18", "MLP", "LeNet", "ResNet50", "ResNet101", "RNN", "GRU", "LSTM", "BiLSTM"]
     for item in models:
         args.model = item
         train_loader, test_loader, val_loader, model, train_epoch = load_data_n_model(args.dataset, args.model, root,

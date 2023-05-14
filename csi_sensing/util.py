@@ -133,7 +133,7 @@ def load_data_n_model(dataset_name, model_name, root, modal='Phase', val='easy')
         if model_name == 'MLP':
             print("using model: "+model_name)
             model = MH_MLP(num_classes)
-            train_epoch = 5
+            train_epoch = 25
         elif model_name == 'LeNet':
             print("using model: " + model_name)
             model = MH_LeNet(num_classes)
