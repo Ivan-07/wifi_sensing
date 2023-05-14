@@ -129,18 +129,44 @@ def load_data_n_model(dataset_name, model_name, root, modal='Phase', val='easy')
             dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/test/', modal=modal), batch_size=32, shuffle=False)
         val_loader = torch.utils.data.DataLoader(
             dataset=MH_CSI_Dataset(root + 'MH_data/val_'+val+'/' + modal + '/', modal=modal), batch_size=32, shuffle=False)
-        if model_name == 'ResNet18':
-            print("using model: ResNet18")
+
+        if model_name == 'MLP':
+            print("using model: "+model_name)
+            model = MH_MLP(num_classes)
+            train_epoch = 50
+        elif model_name == 'LeNet':
+            print("using model: " + model_name)
+            model = MH_LeNet(num_classes)
+            train_epoch = 50
+        elif model_name == 'ResNet18':
+            print("using model: " + model_name)
             model = MH_ResNet18(num_classes)
-            train_epoch = 50
+            train_epoch = 25
         elif model_name == 'ResNet50':
-            print('using model: ResNet50')
+            print("using model: " + model_name)
             model = MH_ResNet50(num_classes)
+            train_epoch = 25
+        elif model_name == 'ResNet101':
+            print("using model: " + model_name)
+            model = MH_ResNet101(num_classes)
+            train_epoch = 25
+        elif model_name == 'RNN':
+            print("using model: " + model_name)
+            model = MH_RNN(num_classes)
             train_epoch = 50
-        elif model_name == 'EfficientNet':
-            print('using model: EfficientNet')
-            model = MH_EfficientNet(num_classes)
+        elif model_name == 'GRU':
+            print("using model: " + model_name)
+            model = MH_GRN(num_classes)
             train_epoch = 50
+        elif model_name == 'LSTM':
+            print("using model: " + model_name)
+            model = MH_LSTM(num_classes)
+            train_epoch = 50
+        elif model_name == 'BiLSTM':
+            print("using model: " + model_name)
+            model = MH_BiLSTM(num_classes)
+            train_epoch = 50
+
         return train_loader, test_loader, val_loader, model, train_epoch
 
     elif dataset_name == 'NTU-Fi_HAR':
