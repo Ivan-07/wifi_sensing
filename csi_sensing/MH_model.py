@@ -61,7 +61,7 @@ class LeNet(nn.Module):
     def __init__(self, num_classes):
         super(LeNet, self).__init__()
         self.encoder = nn.Sequential(
-            nn.Conv2d(4, 32, (3, 5), stride=1),
+            nn.Conv2d(4, 32, (15, 23), stride=9),
             nn.ReLU(True),
             nn.Conv2d(32, 64, (3, 3), stride=(1, 3)),
             nn.ReLU(True),
@@ -69,7 +69,7 @@ class LeNet(nn.Module):
             nn.ReLU(True),
         )
         self.fc = nn.Sequential(
-            nn.Linear(184320, 128),  # Adjusted input size
+            nn.Linear(1248, 128),  # Adjusted input size
             nn.ReLU(),
             nn.Linear(128, num_classes)
         )

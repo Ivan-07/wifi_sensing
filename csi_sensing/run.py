@@ -71,9 +71,9 @@ def train(model, tensor_loader, num_epochs, learning_rate, criterion, device, ar
         end_time = time.time()
         final_print = 'acc_best:{}, acc_best_epoch:{}, mmse_best:{}, mmse_best_epoch:{}, cost_time_average:{:.4f}'.format(
             float(acc_best),
-            float(acc_best_epoch),
+            acc_best_epoch,
             float(mmse_best),
-            float(mmse_best_epoch),
+            mmse_best_epoch,
             float((end_time - start_time) / num_epochs))
         print(final_print)
         f.write(final_print + '\n')
@@ -141,9 +141,9 @@ def my_test(model, tensor_loader, criterion, device, args):
             end_time = time.time()
             final_print = 'acc_best:{}, acc_best_epoch:{}, mmse_best:{}, mmse_best_epoch:{}, cost_time_average:{:.4f}'.format(
                 float(acc_best),
-                float(acc_best_epoch),
+                acc_best_epoch,
                 float(mmse_best),
-                float(mmse_best_epoch),
+                mmse_best_epoch,
                 float((end_time - start_time) / (epoch+1)))
             print(final_print)
             f.write(final_print + '\n')
@@ -230,42 +230,45 @@ def main():
     parser.add_argument('--val', choices=['easy', 'medium', 'hard'])
     args = parser.parse_args()
 
-    train_loader, test_loader, val_loader, model, train_epoch = load_data_n_model(args.dataset, args.model, root,
-                                                                                  args.modal, args.val)
-    criterion = nn.CrossEntropyLoss()
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
+    models = ["MLP", "LeNet", "ResNet18", "ResNet50", "ResNet101", "RNN", "GRU", "LSTM", "BiLSTM"]
+    for item in models:
+        args.model = item
+        train_loader, test_loader, val_loader, model, train_epoch = load_data_n_model(args.dataset, args.model, root,
+                                                                                      args.modal, args.val)
+        criterion = nn.CrossEntropyLoss()
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model.to(device)
 
-    train(
-        model=model,
-        tensor_loader=train_loader,
-        num_epochs=train_epoch,
-        learning_rate=1e-3,
-        criterion=criterion,
-        device=device,
-        args=args
-    )
-    # test(
-    #     model=model,
-    #     tensor_loader=test_loader,
-    #     criterion=criterion,
-    #     device=device,
-    #     args=args
-    # )
-    my_test(
-        model=model,
-        tensor_loader=test_loader,
-        criterion=criterion,
-        device=device,
-        args=args
-    )
-    # my_val(
-    #     model=model,
-    #     tensor_loader=val_loader,
-    #     criterion=criterion,
-    #     device=device,
-    #     args=args
-    # )
+        train(
+            model=model,
+            tensor_loader=train_loader,
+            num_epochs=train_epoch,
+            learning_rate=1e-3,
+            criterion=criterion,
+            device=device,
+            args=args
+        )
+        # test(
+        #     model=model,
+        #     tensor_loader=test_loader,
+        #     criterion=criterion,
+        #     device=device,
+        #     args=args
+        # )
+        my_test(
+            model=model,
+            tensor_loader=test_loader,
+            criterion=criterion,
+            device=device,
+            args=args
+        )
+        # my_val(
+        #     model=model,
+        #     tensor_loader=val_loader,
+        #     criterion=criterion,
+        #     device=device,
+        #     args=args
+        # )
     return
 
 
