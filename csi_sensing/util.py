@@ -133,11 +133,11 @@ def load_data_n_model(dataset_name, model_name, root, modal='Phase', val='easy')
         if model_name == 'MLP':
             print("using model: "+model_name)
             model = MH_MLP(num_classes)
-            train_epoch = 50
+            train_epoch = 25
         elif model_name == 'LeNet':
             print("using model: " + model_name)
             model = MH_LeNet(num_classes)
-            train_epoch = 50
+            train_epoch = 25
         elif model_name == 'ResNet18':
             print("using model: " + model_name)
             model = MH_ResNet18(num_classes)
@@ -153,19 +153,19 @@ def load_data_n_model(dataset_name, model_name, root, modal='Phase', val='easy')
         elif model_name == 'RNN':
             print("using model: " + model_name)
             model = MH_RNN(num_classes)
-            train_epoch = 50
+            train_epoch = 25
         elif model_name == 'GRU':
             print("using model: " + model_name)
             model = MH_GRN(num_classes)
-            train_epoch = 50
+            train_epoch = 25
         elif model_name == 'LSTM':
             print("using model: " + model_name)
             model = MH_LSTM(num_classes)
-            train_epoch = 50
+            train_epoch = 25
         elif model_name == 'BiLSTM':
             print("using model: " + model_name)
             model = MH_BiLSTM(num_classes)
-            train_epoch = 50
+            train_epoch = 25
 
         return train_loader, test_loader, val_loader, model, train_epoch
 

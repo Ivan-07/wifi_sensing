@@ -5,3 +5,5 @@ csi_sensing/Data/*
 csi_sensing/output/*
 csi_sensing/model_pth/*
 data_handler/data/*
+.DS_Store
+csi_sensing/.DS_Store

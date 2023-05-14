@@ -4,9 +4,7 @@ import scipy.io as sio
 import torch
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
-import torch.utils.data as data
-from PIL import Image
-import cv2
+
 
 
 def UT_HAR_dataset(root_dir):

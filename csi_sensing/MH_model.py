@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torchvision.models as models
 
 
@@ -167,4 +166,43 @@ class BiLSTM(nn.Module):
         x = x.permute(0, 2, 1)  # Permute dimensions to (batch_size, 120, 166)
         _, (ht, ct) = self.lstm(x)
         outputs = self.fc(torch.cat((ht[-2], ht[-1]), dim=1))  # Concatenate hidden states from both directions
+        return outputs
+
+
+class CNN_GRU(nn.Module):
+    def __init__(self, num_classes):
+        super(CNN_GRU, self).__init__()
+        self.encoder = nn.Sequential(
+            nn.Conv1d(1, 16, 12, 6),
+            nn.ReLU(),
+            nn.MaxPool1d(2),
+            nn.Conv1d(16, 32, 7, 3),
+            nn.ReLU(),
+        )
+        self.mean = nn.AvgPool1d(40)  # Adjusted pooling size to match the new input size
+        self.gru = nn.GRU(8, 128, num_layers=1)
+        self.classifier = nn.Sequential(
+            nn.Dropout(0.5),
+            nn.Linear(128, num_classes),
+            nn.Softmax(dim=1)
+        )
+
+    def forward(self, x):
+        batch_size = len(x)
+        # batch x 3 x 166 x 120
+        x = x.view(batch_size, 3 * 166, 120)
+        x = x.permute(0, 2, 1)
+        # batch x 120 x 498
+        x = x.reshape(batch_size * 120, 1, 3 * 166)
+        # (batch x 120) x 1 x 498
+        x = self.encoder(x)
+        # (batch x 120) x 32 x 8
+        x = x.permute(0, 2, 1)
+        x = self.mean(x)
+        x = x.reshape(batch_size, 120, 8)
+        # batch x 120 x 8
+        x = x.permute(1, 0, 2)
+        # 120 x batch x 8
+        _, ht = self.gru(x)
+        outputs = self.classifier(ht[-1])
         return outputs
