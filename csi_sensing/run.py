@@ -121,6 +121,7 @@ def my_test(model, tensor_loader, criterion, device, args):
                         accuracy = (predict_y == labels.to(device)).sum().item() / labels.size(0)
                         test_acc += accuracy
                         test_loss += loss.item() * inputs.size(0)
+                        mmse += torch.abs(predict_y - labels.to(device)).sum().item() / labels.size(0) * 0.25
                 epoch_end_time = time.time()
                 cost_time = epoch_end_time - epoch_start_time
                 mmse = mmse / len(tensor_loader)
@@ -159,37 +160,66 @@ def my_val(model, tensor_loader, criterion, device, args):
         files = sorted(files, key=lambda x: int(x.split('_epoch')[-1].split('.')[0]))
         file_path = './output/val_' + args.val + '_' + args.model + '_' + args.modal + '.txt'
         with open(file_path, 'w') as f:
+            start_time = time.time()
+            acc_best = 0
+            acc_best_epoch = -1
+            mmse_best = float('inf')
+            mmse_best_epoch = -1
+            epoch = 0
             for filename in files:
                 model_path = os.path.join(root, filename)
 
                 # 加载模型
+                epoch_start_time = time.time()
                 model.load_state_dict(torch.load(model_path))
 
                 model.eval()
                 test_acc = 0
                 test_loss = 0
-                for data in tensor_loader:
-                    inputs, labels = data
-                    inputs = inputs.to(device)
-                    labels.to(device)
-                    labels = labels.type(torch.LongTensor)
+                mmse = 0
+                with torch.no_grad():
+                    for data in tensor_loader:
+                        inputs, labels = data
+                        inputs = inputs.to(device)
+                        labels.to(device)
+                        labels = labels.type(torch.LongTensor)
 
-                    outputs = model(inputs)
-                    outputs = outputs.type(torch.FloatTensor)
-                    outputs.to(device)
+                        outputs = model(inputs)
+                        outputs = outputs.type(torch.FloatTensor)
+                        outputs.to(device)
 
-                    loss = criterion(outputs, labels)
-                    predict_y = torch.argmax(outputs, dim=1).to(device)
-                    accuracy = (predict_y == labels.to(device)).sum().item() / labels.size(0)
-                    test_acc += accuracy
-                    test_loss += loss.item() * inputs.size(0)
+                        loss = criterion(outputs, labels)
+                        predict_y = torch.argmax(outputs, dim=1).to(device)
+                        accuracy = (predict_y == labels.to(device)).sum().item() / labels.size(0)
+                        test_acc += accuracy
+                        test_loss += loss.item() * inputs.size(0)
+                        mmse += torch.abs(predict_y - labels.to(device)).sum().item() / labels.size(0) * 0.25
+                epoch_end_time = time.time()
+                cost_time = epoch_end_time - epoch_start_time
+                mmse = mmse / len(tensor_loader)
                 test_acc = test_acc / len(tensor_loader)
                 test_loss = test_loss / len(tensor_loader.dataset)
+                if test_acc > acc_best:
+                    acc_best = test_acc
+                    acc_best_epoch = epoch
+                if mmse < mmse_best:
+                    mmse_best = mmse
+                    mmse_best_epoch = epoch
                 res = args.model + " " + args.modal + " " + model_path.split('_')[-1][
-                                                            :-4] + " val accuracy:{:.4f}, loss:{:.5f}".format(
-                    float(test_acc), float(test_loss))
+                                                            :-4] + " val accuracy:{:.4f}, loss:{:.5f}, cost_time:{:.4f},mmse:{:.4f}".format(
+                    float(test_acc), float(test_loss), float(cost_time), float(mmse))
                 print(res)
                 f.write(res + '\n')
+                epoch += 1
+            end_time = time.time()
+            final_print = 'acc_best:{}, acc_best_epoch:{}, mmse_best:{}, mmse_best_epoch:{}, cost_time_average:{:.4f}'.format(
+                float(acc_best),
+                acc_best_epoch,
+                float(mmse_best),
+                mmse_best_epoch,
+                float((end_time - start_time) / (epoch + 1)))
+            print(final_print)
+            f.write(final_print + '\n')
     return
 
 
