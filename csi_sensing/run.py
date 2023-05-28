@@ -62,9 +62,11 @@ def train(model, tensor_loader, num_epochs, learning_rate, criterion, device, ar
             if mmse < mmse_best:
                 mmse_best = mmse
                 mmse_best_epoch = epoch
-            res = 'Epoch:{}, Accuracy:{:.4f},Loss:{:.9f},Cost_time:{:.4f},Mmse:{:.4f}'.format(epoch, float(epoch_accuracy),
-                                                                                      float(epoch_loss),
-                                                                                      float(cost_time), float(mmse))
+            res = 'Epoch:{}, Accuracy:{:.4f},Loss:{:.9f},Cost_time:{:.4f},Mmse:{:.4f}'.format(epoch,
+                                                                                              float(epoch_accuracy),
+                                                                                              float(epoch_loss),
+                                                                                              float(cost_time),
+                                                                                              float(mmse))
             print(res)
             f.write(res + '\n')
             if (epoch + 1) % 1 == 0:
@@ -146,7 +148,7 @@ def my_test(model, tensor_loader, criterion, device, args):
                 acc_best_epoch,
                 float(mmse_best),
                 mmse_best_epoch,
-                float((end_time - start_time) / (epoch+1)))
+                float((end_time - start_time) / (epoch + 1)))
             print(final_print)
             f.write(final_print + '\n')
     return
@@ -258,14 +260,14 @@ def main():
                         choices=['MLP', 'LeNet', 'ResNet18', 'ResNet50', 'ResNet101', 'RNN', 'GRU', 'LSTM', 'BiLSTM',
                                  'CNN+GRU', 'ViT', 'EfficientNet'])
     parser.add_argument('--modal', choices=['Mag', 'Phase'])
-    parser.add_argument('--val', choices=['easy', 'medium', 'hard'])
     args = parser.parse_args()
 
-    models = ["MobileNetv2_075"]
+    models = ["MLP", "LeNet", "VGG16", "ResNet18", "ResNet50", "ResNet101", "InceptionV3", "EfficientNet", "ViT",
+              "SwinTransformer", "MobileNetv2_035", "MobileNetv2_050", "MobileNetv2_075"]
     for item in models:
         args.model = item
         train_loader, test_loader, model, train_epoch = load_data_n_model(args.dataset, args.model, root,
-                                                                                      args.modal, args.val)
+                                                                          args.modal, args.val)
         criterion = nn.CrossEntropyLoss()
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model.to(device)
