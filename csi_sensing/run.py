@@ -50,7 +50,7 @@ def train(model, tensor_loader, num_epochs, learning_rate, criterion, device, ar
                 epoch_loss += loss.item() * inputs.size(0)
                 predict_y = torch.argmax(outputs, dim=1).to(device)
                 epoch_accuracy += (predict_y == labels.to(device)).sum().item() / labels.size(0)
-                mmse += distances(predict_y, labels.to(device))
+                mmse += distances(predict_y, labels.to(device))/ labels.size(0)
             epoch_end_time = time.time()
             cost_time = epoch_end_time - epoch_start_time
             mmse = mmse / len(tensor_loader)
@@ -124,7 +124,7 @@ def my_test(model, tensor_loader, criterion, device, args):
                         accuracy = (predict_y == labels.to(device)).sum().item() / labels.size(0)
                         test_acc += accuracy
                         test_loss += loss.item() * inputs.size(0)
-                        mmse += distances(predict_y, labels.to(device))
+                        mmse += distances(predict_y, labels.to(device))/ labels.size(0)
                 epoch_end_time = time.time()
                 cost_time = epoch_end_time - epoch_start_time
                 mmse = mmse / len(tensor_loader)
@@ -196,7 +196,7 @@ def my_val(model, tensor_loader, criterion, device, args):
                         accuracy = (predict_y == labels.to(device)).sum().item() / labels.size(0)
                         test_acc += accuracy
                         test_loss += loss.item() * inputs.size(0)
-                        mmse += distances(predict_y, labels.to(device))
+                        mmse += distances(predict_y, labels.to(device))/ labels.size(0)
                 epoch_end_time = time.time()
                 cost_time = epoch_end_time - epoch_start_time
                 mmse = mmse / len(tensor_loader)
@@ -267,7 +267,7 @@ def main():
     for item in models:
         args.model = item
         train_loader, test_loader, model, train_epoch = load_data_n_model(args.dataset, args.model, root,
-                                                                          args.modal, args.val)
+                                                                          args.modal)
         criterion = nn.CrossEntropyLoss()
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model.to(device)
