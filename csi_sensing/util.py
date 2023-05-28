@@ -1,26 +1,32 @@
-from dataset import *
-from UT_HAR_model import *
-from NTU_Fi_model import *
 from MH_model import *
-from widar_model import *
-from self_supervised_model import *
-import torch
+from dataset import *
+import math
+
+from thop import profile
 
 
 def load_data_n_model(dataset_name, model_name, root, modal='Phase', val='easy'):
-    classes = {'UT_HAR_data': 7, 'NTU-Fi-HumanID': 14, 'NTU-Fi_HAR': 6, 'Widar': 22, 'MH_data': 35}
+    classes = {'UT_HAR_data': 7, 'NTU-Fi-HumanID': 14, 'NTU-Fi_HAR': 6, 'Widar': 22, 'MH_data': 25}
+    input_size = {'MLP': 224, 'LeNet': 224, 'VGG16': 224, 'ResNet18': 224, 'ResNet50': 224, 'ResNet101': 224,
+                  'InceptionV3': 299, 'EfficientNet': 224, 'ViT': 224, 'SwinTransformer': 384, 'MobileNetv2_035': 224,
+                  'MobileNetv2_050': 224, 'MobileNetv2_075': 224}
     if dataset_name == "MH_data":
-        print('using dataset: MH_data '+modal)
+        print('using dataset: MH_data ' + modal)
         num_classes = classes['MH_data']
 
         train_loader = torch.utils.data.DataLoader(
-            dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/train/', modal=modal), batch_size=32, shuffle=True)
+            dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/train/', modal=modal,
+                                   input_size=input_size[model_name]), batch_size=4, shuffle=True)
         test_loader = torch.utils.data.DataLoader(
-            dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/test/', modal=modal), batch_size=32, shuffle=False)
+            dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/test/', modal=modal,
+                                   input_size=input_size[model_name]), batch_size=4, shuffle=False)
         # val_loader = torch.utils.data.DataLoader(
         #     dataset=MH_CSI_Dataset(root + 'MH_data/val_'+val+'/' + modal + '/', modal=modal), batch_size=32, shuffle=False)
-
-        if model_name == 'LeNet':
+        if model_name == 'MLP':
+            print("using model: " + model_name)
+            model = MLP(num_classes)
+            train_epoch = 25
+        elif model_name == 'LeNet':
             print("using model: " + model_name)
             model = LeNet(num_classes)
             train_epoch = 25
@@ -40,162 +46,52 @@ def load_data_n_model(dataset_name, model_name, root, modal='Phase', val='easy')
             print("using model: " + model_name)
             model = EfficientNet(num_classes)
             train_epoch = 25
+        elif model_name == 'ViT':
+            print("using model: " + model_name)
+            model = ViT(num_classes)
+            train_epoch = 25
         elif model_name == 'SwinTransformer':
             print("using model: " + model_name)
             model = SwinTransformer(num_classes)
             train_epoch = 25
+        elif model_name == 'MobileNetv2_035':
+            print("using model: " + model_name)
+            model = MobileNetv2_035(num_classes)
+            train_epoch = 25
+        elif model_name == 'MobileNetv2_050':
+            print("using model: " + model_name)
+            model = MobileNetv2_050(num_classes)
+            train_epoch = 25
+        elif model_name == 'MobileNetv2_075':
+            print("using model: " + model_name)
+            model = MobileNetv2_075(num_classes)
+            train_epoch = 25
 
-
-        return train_loader, test_loader, model, train_epoch
-
-    elif dataset_name == 'NTU-Fi_HAR':
-        print('using dataset: NTU-Fi_HAR')
-        num_classes = classes['NTU-Fi_HAR']
-        train_loader = torch.utils.data.DataLoader(dataset=CSI_Dataset(root + 'NTU-Fi_HAR/train_amp/'), batch_size=64,
-                                                   shuffle=False)
-        test_loader = torch.utils.data.DataLoader(dataset=CSI_Dataset(root + 'NTU-Fi_HAR/test_amp/'), batch_size=64,
-                                                  shuffle=False)
-        if model_name == 'MLP':
-            print("using model: MLP")
-            model = NTU_Fi_MLP(num_classes)
-            train_epoch = 10  # 10
-        elif model_name == 'LeNet':
-            print("using model: LeNet")
-            model = NTU_Fi_LeNet(num_classes)
-            train_epoch = 10  # 10
-        elif model_name == 'ResNet18':
-            print("using model: ResNet18")
-            model = NTU_Fi_ResNet18(num_classes)
-            train_epoch = 10
-        elif model_name == 'ResNet50':
-            print("using model: ResNet50")
-            model = NTU_Fi_ResNet50(num_classes)
-            train_epoch = 10  # 40
-        elif model_name == 'ResNet101':
-            print("using model: ResNet101")
-            model = NTU_Fi_ResNet101(num_classes)
-            train_epoch = 30
-        elif model_name == 'RNN':
-            print("using model: RNN")
-            model = NTU_Fi_RNN(num_classes)
-            train_epoch = 70
-        elif model_name == 'GRU':
-            print("using model: GRU")
-            model = NTU_Fi_GRU(num_classes)
-            train_epoch = 30  # 20
-        elif model_name == 'LSTM':
-            print("using model: LSTM")
-            model = NTU_Fi_LSTM(num_classes)
-            train_epoch = 30  # 20
-        elif model_name == 'BiLSTM':
-            print("using model: BiLSTM")
-            model = NTU_Fi_BiLSTM(num_classes)
-            train_epoch = 30  # 20
-        elif model_name == 'CNN+GRU':
-            print("using model: CNN+GRU")
-            model = NTU_Fi_CNN_GRU(num_classes)
-            train_epoch = 100  # 20
-        elif model_name == 'ViT':
-            print("using model: ViT")
-            model = NTU_Fi_ViT(num_classes=num_classes)
-            train_epoch = 30
-        return train_loader, test_loader, model, train_epoch
-
-    elif dataset_name == 'Widar':
-        print('using dataset: Widar')
-        num_classes = classes['Widar']
-        train_loader = torch.utils.data.DataLoader(dataset=Widar_Dataset(root + 'Widardata/train/'), batch_size=64,
-                                                   shuffle=True)
-        test_loader = torch.utils.data.DataLoader(dataset=Widar_Dataset(root + 'Widardata/test/'), batch_size=128,
-                                                  shuffle=False)
-        if model_name == 'MLP':
-            print("using model: MLP")
-            model = Widar_MLP(num_classes)
-            train_epoch = 30  # 20
-        elif model_name == 'LeNet':
-            print("using model: LeNet")
-            model = Widar_LeNet(num_classes)
-            train_epoch = 100  # 40
-        elif model_name == 'ResNet18':
-            print("using model: ResNet18")
-            model = Widar_ResNet18(num_classes)
-            train_epoch = 100
-        elif model_name == 'ResNet50':
-            print("using model: ResNet50")
-            model = Widar_ResNet50(num_classes)
-            train_epoch = 100  # 40
-        elif model_name == 'ResNet101':
-            print("using model: ResNet101")
-            model = Widar_ResNet101(num_classes)
-            train_epoch = 100
-        elif model_name == 'RNN':
-            print("using model: RNN")
-            model = Widar_RNN(num_classes)
-            train_epoch = 500
-        elif model_name == 'GRU':
-            print("using model: GRU")
-            model = Widar_GRU(num_classes)
-            train_epoch = 200
-        elif model_name == 'LSTM':
-            print("using model: LSTM")
-            model = Widar_LSTM(num_classes)
-            train_epoch = 200  # 20
-        elif model_name == 'BiLSTM':
-            print("using model: BiLSTM")
-            model = Widar_BiLSTM(num_classes)
-            train_epoch = 200
-        elif model_name == 'CNN+GRU':
-            print("using model: CNN+GRU")
-            model = Widar_CNN_GRU(num_classes)
-            train_epoch = 200  # 20
-        elif model_name == 'ViT':
-            print("using model: ViT")
-            model = Widar_ViT(num_classes=num_classes)
-            train_epoch = 200
+        # input = torch.randn(1, 3, input_size[model_name], input_size[model_name])
+        # flops, params = profile(model, (input,))
         return train_loader, test_loader, model, train_epoch
 
 
-def load_unsupervised_data_n_model(model_name, root):
-    HAR_train_dataset = CSI_Dataset(root + 'NTU-Fi_HAR/train_amp/')
-    HAR_test_dataset = CSI_Dataset(root + 'NTU-Fi_HAR/test_amp/')
-    unsupervised_train_dataset = torch.utils.data.ConcatDataset([HAR_train_dataset, HAR_test_dataset])
-    unsupervised_train_loader = torch.utils.data.DataLoader(dataset=unsupervised_train_dataset, batch_size=64,
-                                                            shuffle=True)
-    supervised_train_loader = torch.utils.data.DataLoader(dataset=CSI_Dataset(root + 'NTU-Fi-HumanID/test_amp/'),
-                                                          batch_size=64, shuffle=True)
-    test_loader = torch.utils.data.DataLoader(dataset=CSI_Dataset(root + 'NTU-Fi-HumanID/train_amp/'), batch_size=64,
-                                              shuffle=False)
-    if model_name == 'MLP':
-        print("using model: MLP_Parrallel")
-        model = MLP_Parrallel()
-    elif model_name == 'LeNet':
-        print("using model: CNN_Parrallel")
-        model = CNN_Parrallel()
-    elif model_name == 'ResNet18':
-        print("using model: ResNet18_Parrallel")
-        model = ResNet18_Parrallel()
-    elif model_name == 'ResNet50':
-        print("using model: ResNet50_Parralle")
-        model = ResNet50_Parrallel()
-    elif model_name == 'ResNet101':
-        print("using model: ResNet101_Parrallel")
-        model = ResNet101_Parrallel()
-    elif model_name == 'RNN':
-        print("using model: RNN_Parrallel")
-        model = RNN_Parrallel()
-    elif model_name == 'GRU':
-        print("using model: GRU_Parrallel")
-        model = GRU_Parrallel()
-    elif model_name == 'LSTM':
-        print("using model: LSTM_Parrallel")
-        model = LSTM_Parrallel()
-    elif model_name == 'BiLSTM':
-        print("using model: BiLSTM_Parrallel")
-        model = BiLSTM_Parrallel()
-    elif model_name == 'CNN+GRU':
-        print("using model: CNN_GRU_Parrallel")
-        model = CNN_GRU_Parrallel()
-    elif model_name == 'ViT':
-        print("using model: ViT_Parrallel")
-        model = ViT_Parrallel()
-    return unsupervised_train_loader, supervised_train_loader, test_loader, model
+def distances(p1_list_tensor, p2_list_tensor):
+    p1_list = p1_list_tensor.cpu().numpy()
+    p2_list = p2_list_tensor.cpu().numpy()
+    dist_sum = 0
+    for i in range(len(p1_list)):
+        p1 = p1_list[i]
+        p2 = p2_list[i]
+        # 将点的编号转换为横向和纵向坐标
+        x1 = p1 // 5 * 0.5
+        y1 = p1 % 5 * 0.5
+        x2 = p2 // 5 * 0.5
+        y2 = p2 % 5 * 0.5
+
+        # 计算距离差值
+        dx = x2 - x1
+        dy = y2 - y1
+
+        # 计算距离
+        dist = math.sqrt(dx ** 2 + dy ** 2)
+
+        # 将距离添加到列表中
+        dist_sum += dist
+    return dist_sum

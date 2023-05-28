@@ -1,264 +1,112 @@
 import torch
 import torch.nn as nn
-import torchvision.models as models
 import timm
+import torch.nn.functional as F
+
+
+class MH_MLP(nn.Module):
+    def __init__(self, in_size, hidden_size, out_size):
+        super(MH_MLP, self).__init__()
+        self.fc1 = nn.Linear(in_size, hidden_size)  # first fully connected layer
+        self.relu1 = nn.ReLU()  # ReLU activation function after fc1
+        self.fc2 = nn.Linear(hidden_size, hidden_size)  # second fully connected layer
+        self.relu2 = nn.ReLU()  # ReLU activation function after fc2
+        self.fc3 = nn.Linear(hidden_size, out_size)  # third fully connected layer
+
+    def forward(self, x):
+        x = x.view(x.size(0), -1)  # flatten the input tensor
+        x = self.fc1(x)
+        x = self.relu1(x)
+        x = self.fc2(x)
+        x = self.relu2(x)
+        x = self.fc3(x)
+        return x
+
+
+def MLP(num_classes):
+    return MH_MLP(3 * 224 * 224, 256, num_classes)
+
+
+class MH_LeNet(nn.Module):
+    def __init__(self, num_classes=25):
+        super(MH_LeNet, self).__init__()
+        self.conv1 = nn.Conv2d(3, 6, 5)  # 输入通道数为3，输出通道数为6，卷积核大小为5x5
+        self.pool = nn.MaxPool2d(2, 2)  # 池化核的大小为2x2，步长为2
+        self.conv2 = nn.Conv2d(6, 16, 5)  # 输入通道数为6，输出通道数为16，卷积核大小为5x5
+        self.fc1 = nn.Linear(16 * 53 * 53, 120)  # 两个卷积层和池化层后，输出的特征图大小为(16, 53, 53)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, num_classes)  # 最后一个全连接层的输出大小为10，表示需要分类10个类别
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))  # 进行第一个卷积操作，并使用ReLU激活函数，然后进行池化操作
+        x = self.pool(F.relu(self.conv2(x)))  # 进行第二个卷积操作，并使用ReLU激活函数，然后进行池化操作
+        x = x.view(-1, 16 * 53 * 53)  # 将卷积层的输出展成一维向量
+        x = F.relu(self.fc1(x))  # 进行第一个全连接层的计算，并使用ReLU激活函数
+        x = F.relu(self.fc2(x))  # 进行第二个全连接层的计算，并使用ReLU激活函数
+        x = self.fc3(x)  # 进行输出层的计算
+        return x
 
 
 def LeNet(num_classes):
-    # 载入预训练的 LeNet 模型
-    model = timm.create_model('lenet', pretrained=True)
-
-    # 修改模型的输出层
-    model.fc4 = nn.Linear(84, num_classes)
+    return MH_LeNet(num_classes)
 
 
 def VGG16(num_classes):
     # 载入预训练的 VGG 模型
-    model = timm.create_model('vgg16', pretrained=True)
-
-    num_features = model.head.in_features
-    model.head = torch.nn.Linear(num_features, num_classes)
+    model = timm.create_model('vgg16', pretrained=True, num_classes=num_classes)
     return model
 
 
 def ResNet18(num_classes):
-    model = timm.create_model('resnet18', pretrained=True)
-    # 获取模型输出的特征维度
-    num_features = model.num_features
-    model.head = nn.Linear(num_features, num_classes)
+    model = timm.create_model('resnet18', pretrained=True, num_classes=num_classes)
+
+    return model
+
+
+def ResNet50(num_classes):
+    model = timm.create_model('resnet50', pretrained=True, num_classes=num_classes)
+    return model
+
+
+def ResNet101(num_classes):
+    model = timm.create_model('resnet101', pretrained=True, num_classes=num_classes)
     return model
 
 
 def InceptionV3(num_classes):
     # 载入预训练的 Inception 模型
-    model = timm.create_model('inception_v3', pretrained=True)
-
-    # 修改模型的输出层
-    model.fc = nn.Linear(2048, num_classes)
+    model = timm.create_model('inception_v3', pretrained=True, num_classes=num_classes)
     return model
 
 
 def EfficientNet(num_classes):
     # 载入预训练的 EfficientNet 模型
-    model = timm.create_model('efficientnet_b0', pretrained=True)
-
-    # 修改模型的输出层
-    model.classifier = nn.Linear(1280, num_classes)
+    model = timm.create_model('efficientnet_b0', pretrained=True, num_classes=num_classes)
     return model
 
+
 def ViT(num_classes):
-    model = timm.create_model('vit_base_patch16_224', pretrained=True)
-    num_features = model.head.in_features
-    model.head = torch.nn.Linear(num_features, num_classes)
+    model = timm.create_model('vit_base_patch16_224', pretrained=True, num_classes=num_classes)
     return model
 
 
 def SwinTransformer(num_classes):
-    model = timm.create_model('swin_base_patch4_window12_384', pretrained=True)
-    num_features = model.head.in_features
-    model.head = torch.nn.Linear(num_features, num_classes)
+    model = timm.create_model('swin_base_patch4_window12_384', pretrained=True, num_classes=num_classes)
     return model
 
-# def MH_MLP(num_classes):
-#     return MLP(num_classes)
-#
-#
-# def MH_LeNet(num_classes):
-#     return LeNet(num_classes)
-#
-#
-# def MH_ResNet18(num_classes):
-#     return ResNet18(num_classes)
-#
-#
-# def MH_ResNet50(num_classes):
-#     return ResNet50(num_classes=num_classes)
-#
-#
-# def MH_ResNet101(num_classes):
-#     return ResNet101(num_classes=num_classes)
-#
-#
-# def MH_RNN(num_classes):
-#     return RNN(num_classes)
-#
-#
-# def MH_GRN(num_classes):
-#     return GRU(num_classes)
-#
-#
-# def MH_LSTM(num_classes):
-#     return LSTM(num_classes)
-#
-#
-# def MH_BiLSTM(num_classes):
-#     return BiLSTM(num_classes)
-#
-#
-# class MLP(nn.Module):
-#     def __init__(self, num_classes):
-#         super(MLP, self).__init__()
-#         self.fc = nn.Sequential(
-#             nn.Linear(4 * 166 * 120, 1024),
-#             nn.ReLU(),
-#             nn.Linear(1024, 128),
-#             nn.ReLU(),
-#         )
-#         self.classifier = nn.Linear(128, num_classes)
-#
-#     def forward(self, x):
-#         x = x.view(-1, 4 * 166 * 120)
-#         x = self.fc(x)
-#         x = self.classifier(x)
-#         return x
-#
-#
-# class LeNet(nn.Module):
-#     def __init__(self, num_classes):
-#         super(LeNet, self).__init__()
-#         self.encoder = nn.Sequential(
-#             nn.Conv2d(4, 32, (15, 23), stride=9),
-#             nn.ReLU(True),
-#             nn.Conv2d(32, 64, (3, 3), stride=(1, 3)),
-#             nn.ReLU(True),
-#             nn.Conv2d(64, 96, (3, 3), stride=(1, 3)),
-#             nn.ReLU(True),
-#         )
-#         self.fc = nn.Sequential(
-#             nn.Linear(1248, 128),  # Adjusted input size
-#             nn.ReLU(),
-#             nn.Linear(128, num_classes)
-#         )
-#
-#     def forward(self, x):
-#         x = self.encoder(x)
-#         x = x.view(x.size(0), -1)
-#         out = self.fc(x)
-#         return out
-#
-#
-# class ResNet18(nn.Module):
-#     def __init__(self, num_classes):
-#         super(ResNet18, self).__init__()
-#         self.resnet = models.resnet18(pretrained=True)
-#         self.resnet.conv1 = nn.Conv2d(4, 64, kernel_size=7, stride=2, padding=3, bias=False)
-#         self.resnet.fc = nn.Linear(512, num_classes)
-#
-#     def forward(self, x):
-#         return self.resnet(x)
-#
-#
-# class ResNet50(nn.Module):
-#     def __init__(self, num_classes):
-#         super(ResNet50, self).__init__()
-#         self.resnet = models.resnet50(pretrained=True)
-#         self.resnet.conv1 = nn.Conv2d(4, 64, kernel_size=7, stride=2, padding=3, bias=False)
-#         self.resnet.fc = nn.Linear(2048, num_classes)
-#
-#     def forward(self, x):
-#         return self.resnet(x)
-#
-#
-# class ResNet101(nn.Module):
-#     def __init__(self, num_classes):
-#         super(ResNet101, self).__init__()
-#         self.resnet = models.resnet101(pretrained=True)
-#         self.resnet.conv1 = nn.Conv2d(4, 64, kernel_size=7, stride=2, padding=3, bias=False)
-#         self.resnet.fc = nn.Linear(2048, num_classes)
-#
-#     def forward(self, x):
-#         return self.resnet(x)
-#
-#
-# class RNN(nn.Module):
-#     def __init__(self, num_classes):
-#         super(RNN, self).__init__()
-#         # input size (4, 166, 120)
-#         self.rnn = nn.RNN(166, 64, num_layers=1)  # Update input size to 166
-#         self.fc = nn.Linear(64, num_classes)
-#
-#     def forward(self, x):
-#         x = x.view(-1, 166, 120)  # Update view dimensions to (166, 120)
-#         x = x.permute(2, 0, 1)  # Update permute dimensions
-#         _, ht = self.rnn(x)
-#         outputs = self.fc(ht[-1])
-#         return outputs
-#
-#
-# class GRU(nn.Module):
-#     def __init__(self, num_classes):
-#         super(GRU, self).__init__()
-#         self.gru = nn.GRU(166, 64, num_layers=1, batch_first=True)  # Update the input size and set batch_first=True
-#         self.fc = nn.Linear(64, num_classes)
-#
-#     def forward(self, x):
-#         x = x.permute(0, 2, 1)  # Permute dimensions to (batch_size, 120, 166)
-#         _, ht = self.gru(x)
-#         outputs = self.fc(ht.squeeze(0))  # Squeeze the batch dimension
-#         return outputs
-#
-#
-# class LSTM(nn.Module):
-#     def __init__(self, num_classes):
-#         super(LSTM, self).__init__()
-#         self.lstm = nn.LSTM(166, 64, num_layers=1, batch_first=True)  # Update the input size and set batch_first=True
-#         self.fc = nn.Linear(64, num_classes)
-#
-#     def forward(self, x):
-#         x = x.permute(0, 2, 1)  # Permute dimensions to (batch_size, 120, 166)
-#         _, (ht, ct) = self.lstm(x)
-#         outputs = self.fc(ht[-1])
-#         return outputs
-#
-#
-# class BiLSTM(nn.Module):
-#     def __init__(self, num_classes):
-#         super(BiLSTM, self).__init__()
-#         self.lstm = nn.LSTM(166, 64, num_layers=1, bidirectional=True,
-#                             batch_first=True)  # Update the input size and set batch_first=True
-#         self.fc = nn.Linear(128, num_classes)  # Double the input size for bidirectional LSTM
-#
-#     def forward(self, x):
-#         x = x.permute(0, 2, 1)  # Permute dimensions to (batch_size, 120, 166)
-#         _, (ht, ct) = self.lstm(x)
-#         outputs = self.fc(torch.cat((ht[-2], ht[-1]), dim=1))  # Concatenate hidden states from both directions
-#         return outputs
-#
-#
-# class CNN_GRU(nn.Module):
-#     def __init__(self, num_classes):
-#         super(CNN_GRU, self).__init__()
-#         self.encoder = nn.Sequential(
-#             nn.Conv1d(1, 16, 12, 6),
-#             nn.ReLU(),
-#             nn.MaxPool1d(2),
-#             nn.Conv1d(16, 32, 7, 3),
-#             nn.ReLU(),
-#         )
-#         self.mean = nn.AvgPool1d(40)  # Adjusted pooling size to match the new input size
-#         self.gru = nn.GRU(8, 128, num_layers=1)
-#         self.classifier = nn.Sequential(
-#             nn.Dropout(0.5),
-#             nn.Linear(128, num_classes),
-#             nn.Softmax(dim=1)
-#         )
-#
-#     def forward(self, x):
-#         batch_size = len(x)
-#         # batch x 3 x 166 x 120
-#         x = x.view(batch_size, 3 * 166, 120)
-#         x = x.permute(0, 2, 1)
-#         # batch x 120 x 498
-#         x = x.reshape(batch_size * 120, 1, 3 * 166)
-#         # (batch x 120) x 1 x 498
-#         x = self.encoder(x)
-#         # (batch x 120) x 32 x 8
-#         x = x.permute(0, 2, 1)
-#         x = self.mean(x)
-#         x = x.reshape(batch_size, 120, 8)
-#         # batch x 120 x 8
-#         x = x.permute(1, 0, 2)
-#         # 120 x batch x 8
-#         _, ht = self.gru(x)
-#         outputs = self.classifier(ht[-1])
-#         return outputs
+
+def MobileNetv2_035(num_classes):
+    model = timm.create_model('mobilenetv2_035', pretrained=False, num_classes=num_classes)
+    return model
+
+
+def MobileNetv2_050(num_classes):
+    model = timm.create_model('mobilenetv2_050', pretrained=False, num_classes=num_classes)
+    return model
+
+
+def MobileNetv2_075(num_classes):
+    model = timm.create_model('mobilenetv2_075', pretrained=False, num_classes=num_classes)
+    return model
+
+

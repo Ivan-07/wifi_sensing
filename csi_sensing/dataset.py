@@ -9,7 +9,7 @@ import torchvision.transforms as transforms
 class MH_CSI_Dataset(Dataset):
     """CSI dataset."""
 
-    def __init__(self, root_dir, modal='Phase', transform=None, few_shot=False, k=5, single_trace=True):
+    def __init__(self, root_dir, modal='Phase', transform=None, input_size=224):
         """
         Args:
             root_dir (string): Directory with all the images.
@@ -20,6 +20,7 @@ class MH_CSI_Dataset(Dataset):
         self.root_dir = root_dir
         self.modal = modal
         self.transform = transform
+        self.input_size = input_size
         self.data_list = glob.glob(root_dir + '/*/*.mat')
         self.folder = glob.glob(root_dir + '/*/')
         self.data_list = [path.replace('\\', '/') for path in self.data_list]
@@ -45,7 +46,7 @@ class MH_CSI_Dataset(Dataset):
         self.transform = transforms.Compose(
             [
                 transforms.ToTensor(),
-                transforms.Resize((224, 224)),
+                transforms.Resize((self.input_size, self.input_size)),
                 transforms.Normalize(mean=mean, std=std),
             ]
         )
@@ -59,31 +60,3 @@ class MH_CSI_Dataset(Dataset):
         return x, y
 
 
-class Widar_Dataset(Dataset):
-    def __init__(self, root_dir):
-        self.root_dir = root_dir
-        self.data_list = glob.glob(root_dir + '/*/*.csv')
-        self.folder = glob.glob(root_dir + '/*/')
-        self.category = {self.folder[i].split('/')[-2]: i for i in range(len(self.folder))}
-
-    def __len__(self):
-        return len(self.data_list)
-
-    def __getitem__(self, idx):
-        if torch.is_tensor(idx):
-            idx = idx.tolist()
-
-        sample_dir = self.data_list[idx]
-        y = self.category[sample_dir.split('/')[-2]]
-        x = np.genfromtxt(sample_dir, delimiter=',')
-
-        # normalize
-        x = (x - 0.0025) / 0.0119
-
-        # reshape: 22,400 -> 22,20,20
-        x = x.reshape(22, 20, 20)
-        # interpolate from 20x20 to 32x32
-        # x = self.reshape(x)
-        x = torch.FloatTensor(x)
-
-        return x, y
