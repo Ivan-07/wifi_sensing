@@ -16,10 +16,10 @@ def load_data_n_model(dataset_name, model_name, root, modal='Phase', val='easy')
 
         train_loader = torch.utils.data.DataLoader(
             dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/train/', modal=modal,
-                                   input_size=input_size[model_name]), batch_size=4, shuffle=True)
+                                   input_size=input_size[model_name]), batch_size=64, shuffle=True)
         test_loader = torch.utils.data.DataLoader(
             dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/test/', modal=modal,
-                                   input_size=input_size[model_name]), batch_size=4, shuffle=False)
+                                   input_size=input_size[model_name]), batch_size=64, shuffle=False)
         # val_loader = torch.utils.data.DataLoader(
         #     dataset=MH_CSI_Dataset(root + 'MH_data/val_'+val+'/' + modal + '/', modal=modal), batch_size=32, shuffle=False)
         if model_name == 'MLP':

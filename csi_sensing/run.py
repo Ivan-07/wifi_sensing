@@ -267,7 +267,7 @@ def main():
     for item in models:
         args.model = item
         train_loader, test_loader, model, train_epoch = load_data_n_model(args.dataset, args.model, root,
-                                                                          args.modal, args.val)
+                                                                          args.modal)
         criterion = nn.CrossEntropyLoss()
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model.to(device)
