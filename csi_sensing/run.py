@@ -260,10 +260,10 @@ def main():
     parser.add_argument('--val', choices=['easy', 'medium', 'hard'])
     args = parser.parse_args()
 
-    models = ["ResNet18", "MLP", "LeNet", "ResNet50", "ResNet101", "RNN", "GRU", "LSTM", "BiLSTM"]
+    models = ["SwinTransformer"]
     for item in models:
         args.model = item
-        train_loader, test_loader, val_loader, model, train_epoch = load_data_n_model(args.dataset, args.model, root,
+        train_loader, test_loader, model, train_epoch = load_data_n_model(args.dataset, args.model, root,
                                                                                       args.modal, args.val)
         criterion = nn.CrossEntropyLoss()
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

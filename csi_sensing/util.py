@@ -9,117 +9,7 @@ import torch
 
 def load_data_n_model(dataset_name, model_name, root, modal='Phase', val='easy'):
     classes = {'UT_HAR_data': 7, 'NTU-Fi-HumanID': 14, 'NTU-Fi_HAR': 6, 'Widar': 22, 'MH_data': 35}
-    if dataset_name == 'UT_HAR_data':
-        print('using dataset: UT-HAR DATA')
-        data = UT_HAR_dataset(root)
-        train_set = torch.utils.data.TensorDataset(data['data\\X_train'], data['label\\y_train'])
-        test_set = torch.utils.data.TensorDataset(torch.cat((data['data\\X_val'], data['data\\X_test']), 0),
-                                                  torch.cat((data['label\\y_val'], data['label\\y_test']), 0))
-        train_loader = torch.utils.data.DataLoader(train_set, batch_size=64, shuffle=True,
-                                                   drop_last=True)  # drop_last=True
-        test_loader = torch.utils.data.DataLoader(test_set, batch_size=256, shuffle=False)
-        if model_name == 'MLP':
-            print("using model: MLP")
-            model = UT_HAR_MLP()
-            train_epoch = 200
-        elif model_name == 'LeNet':
-            print("using model: LeNet")
-            model = UT_HAR_LeNet()
-            train_epoch = 200  # 40
-        elif model_name == 'ResNet18':
-            print("using model: ResNet18")
-            model = UT_HAR_ResNet18()
-            train_epoch = 200  # 70
-        elif model_name == 'ResNet50':
-            print("using model: ResNet50")
-            model = UT_HAR_ResNet50()
-            train_epoch = 100  # 100
-        elif model_name == 'ResNet101':
-            print("using model: ResNet101")
-            model = UT_HAR_ResNet101()
-            train_epoch = 200  # 100
-        elif model_name == 'RNN':
-            print("using model: RNN")
-            model = UT_HAR_RNN()
-            train_epoch = 3000
-        elif model_name == 'GRU':
-            print("using model: GRU")
-            model = UT_HAR_GRU()
-            train_epoch = 200
-        elif model_name == 'LSTM':
-            print("using model: LSTM")
-            model = UT_HAR_LSTM()
-            train_epoch = 200
-        elif model_name == 'BiLSTM':
-            print("using model: BiLSTM")
-            model = UT_HAR_BiLSTM()
-            train_epoch = 200
-        elif model_name == 'CNN+GRU':
-            print("using model: CNN+GRU")
-            model = UT_HAR_CNN_GRU()
-            train_epoch = 200  # 20
-        elif model_name == 'ViT':
-            print("using model: ViT")
-            model = UT_HAR_ViT()
-            train_epoch = 200  # 100
-        return train_loader, test_loader, model, train_epoch
-
-
-    elif dataset_name == 'NTU-Fi-HumanID':
-        print('using dataset: NTU-Fi-HumanID')
-        num_classes = classes['NTU-Fi-HumanID']
-        train_loader = torch.utils.data.DataLoader(dataset=CSI_Dataset(root + 'NTU-Fi-HumanID/test_amp/'),
-                                                   batch_size=64, shuffle=True)
-        test_loader = torch.utils.data.DataLoader(dataset=CSI_Dataset(root + 'NTU-Fi-HumanID/train_amp/'),
-                                                  batch_size=64, shuffle=False)
-        if model_name == 'MLP':
-            print("using model: MLP")
-            model = NTU_Fi_MLP(num_classes)
-            train_epoch = 50  # 15
-        elif model_name == 'LeNet':
-            print("using model: LeNet")
-            model = NTU_Fi_LeNet(num_classes)
-            train_epoch = 50  # 20
-        elif model_name == 'ResNet18':
-            print("using model: ResNet18")
-            model = NTU_Fi_ResNet18(num_classes)
-            train_epoch = 50  # 30
-        elif model_name == 'ResNet50':
-            print("using model: ResNet50")
-            model = NTU_Fi_ResNet50(num_classes)
-            train_epoch = 50  # 40
-        elif model_name == 'ResNet101':
-            print("using model: ResNet101")
-            model = NTU_Fi_ResNet101(num_classes)
-            train_epoch = 50
-        elif model_name == 'RNN':
-            print("using model: RNN")
-            model = NTU_Fi_RNN(num_classes)
-            train_epoch = 75
-        elif model_name == 'GRU':
-            print("using model: GRU")
-            model = NTU_Fi_GRU(num_classes)
-            train_epoch = 50  # 40
-        elif model_name == 'LSTM':
-            print("using model: LSTM")
-            model = NTU_Fi_LSTM(num_classes)
-            train_epoch = 50
-        elif model_name == 'BiLSTM':
-            print("using model: BiLSTM")
-            model = NTU_Fi_BiLSTM(num_classes)
-            train_epoch = 50
-        elif model_name == 'CNN+GRU':
-            print("using model: CNN+GRU")
-            model = NTU_Fi_CNN_GRU(num_classes)
-            train_epoch = 200  # 20
-        elif model_name == 'ViT':
-            print("using model: ViT")
-            model = NTU_Fi_ViT(num_classes=num_classes)
-            train_epoch = 50
-        return train_loader, test_loader, model, train_epoch
-
-
-    elif dataset_name == "MH_data":
+    if dataset_name == "MH_data":
         print('using dataset: MH_data '+modal)
         num_classes = classes['MH_data']
 
@@ -127,47 +17,36 @@ def load_data_n_model(dataset_name, model_name, root, modal='Phase', val='easy')
             dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/train/', modal=modal), batch_size=32, shuffle=True)
         test_loader = torch.utils.data.DataLoader(
             dataset=MH_CSI_Dataset(root + 'MH_data/' + modal + '/test/', modal=modal), batch_size=32, shuffle=False)
-        val_loader = torch.utils.data.DataLoader(
-            dataset=MH_CSI_Dataset(root + 'MH_data/val_'+val+'/' + modal + '/', modal=modal), batch_size=32, shuffle=False)
+        # val_loader = torch.utils.data.DataLoader(
+        #     dataset=MH_CSI_Dataset(root + 'MH_data/val_'+val+'/' + modal + '/', modal=modal), batch_size=32, shuffle=False)
 
-        if model_name == 'MLP':
-            print("using model: "+model_name)
-            model = MH_MLP(num_classes)
-            train_epoch = 25
-        elif model_name == 'LeNet':
+        if model_name == 'LeNet':
             print("using model: " + model_name)
-            model = MH_LeNet(num_classes)
+            model = LeNet(num_classes)
+            train_epoch = 25
+        elif model_name == 'VGG16':
+            print("using model: " + model_name)
+            model = VGG16(num_classes)
+            train_epoch = 25
+        elif model_name == 'InceptionV3':
+            print("using model: " + model_name)
+            model = InceptionV3(num_classes)
             train_epoch = 25
         elif model_name == 'ResNet18':
             print("using model: " + model_name)
-            model = MH_ResNet18(num_classes)
+            model = ResNet18(num_classes)
             train_epoch = 25
-        elif model_name == 'ResNet50':
+        elif model_name == 'EfficientNet':
             print("using model: " + model_name)
-            model = MH_ResNet50(num_classes)
+            model = EfficientNet(num_classes)
             train_epoch = 25
-        elif model_name == 'ResNet101':
+        elif model_name == 'SwinTransformer':
             print("using model: " + model_name)
-            model = MH_ResNet101(num_classes)
-            train_epoch = 25
-        elif model_name == 'RNN':
-            print("using model: " + model_name)
-            model = MH_RNN(num_classes)
-            train_epoch = 25
-        elif model_name == 'GRU':
-            print("using model: " + model_name)
-            model = MH_GRN(num_classes)
-            train_epoch = 25
-        elif model_name == 'LSTM':
-            print("using model: " + model_name)
-            model = MH_LSTM(num_classes)
-            train_epoch = 25
-        elif model_name == 'BiLSTM':
-            print("using model: " + model_name)
-            model = MH_BiLSTM(num_classes)
+            model = SwinTransformer(num_classes)
             train_epoch = 25
 
-        return train_loader, test_loader, val_loader, model, train_epoch
+
+        return train_loader, test_loader, model, train_epoch
 
     elif dataset_name == 'NTU-Fi_HAR':
         print('using dataset: NTU-Fi_HAR')

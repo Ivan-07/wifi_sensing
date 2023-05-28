@@ -1,5 +1,5 @@
 clc;clear;
-% 
+
 % % 设置文件夹路径
 % folder = './data';
 % 
@@ -20,8 +20,8 @@ clc;clear;
 %    sub_files = dir(folder_path);
 % 
 %    position_idx = 0;
-% %    for j=1:length(sub_files)
-%    for j = 17:27
+%    for j=1:length(sub_files)
+% %    for j = 7:27
 %       if strcmp(sub_files(j).name,'.') || strcmp(sub_files(j).name,'..')
 %         continue;
 %       end
@@ -29,8 +29,10 @@ clc;clear;
 %       data_cnt = extractData(dataset_path, j-3, i-3);
 %       fprintf("数据集："+file_list(i).name+" 的第"+(j-3)+"个位置共导入了"+(data_cnt)+"条数据");
 %       position_idx = position_idx+1;
+%       fclose('all');
 %   end
 %    people_idx = people_idx + 1;
+%    
 % end
 % 
 % 
@@ -64,7 +66,7 @@ clc;clear;
 % end
 
 
-folder = './val_hard';
+folder = './val_data/val_hard';
 sub_files = dir(folder);
 
 for j=1:length(sub_files)

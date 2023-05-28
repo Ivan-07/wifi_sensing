@@ -1,6 +1,6 @@
 clc;clear all
 strings = ["Mag", "Phase"];
-dataset_len = 580;
+dataset_len = 150;
 for k=1:2
     string = strings(k);
     for idx=0:24
@@ -17,7 +17,7 @@ for k=1:2
 %         rand_idx = randperm(length(mat_files));
         rand_idx = randperm(dataset_len);
         % 将索引序列拆分成两个部分
-        split_ratio = 0.9;
+        split_ratio = 0.8;
         split_idx = round(split_ratio * dataset_len);
         split1 = rand_idx(1:split_idx);
         split2 = rand_idx(split_idx+1:end);
