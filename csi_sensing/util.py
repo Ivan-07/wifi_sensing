@@ -42,6 +42,14 @@ def load_data_n_model(dataset_name, model_name, root, modal='Phase', val='easy')
             print("using model: " + model_name)
             model = ResNet18(num_classes)
             train_epoch = 25
+        elif model_name == 'ResNet50':
+            print("using model: " + model_name)
+            model = ResNet50(num_classes)
+            train_epoch = 25
+        elif model_name == 'ResNet101':
+            print("using model: " + model_name)
+            model = ResNet101(num_classes)
+            train_epoch = 25
         elif model_name == 'EfficientNet':
             print("using model: " + model_name)
             model = EfficientNet(num_classes)

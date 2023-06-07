@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import timm
 import torch.nn.functional as F
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 
 class MH_MLP(nn.Module):
@@ -53,45 +55,45 @@ def LeNet(num_classes):
 
 def VGG16(num_classes):
     # 载入预训练的 VGG 模型
-    model = timm.create_model('vgg16', pretrained=True, num_classes=num_classes)
+    model = timm.create_model('vgg16', pretrained=False, num_classes=num_classes)
     return model
 
 
 def ResNet18(num_classes):
-    model = timm.create_model('resnet18', pretrained=True, num_classes=num_classes)
+    model = timm.create_model('resnet18', pretrained=False, num_classes=num_classes)
 
     return model
 
 
 def ResNet50(num_classes):
-    model = timm.create_model('resnet50', pretrained=True, num_classes=num_classes)
+    model = timm.create_model('resnet50', pretrained=False, num_classes=num_classes)
     return model
 
 
 def ResNet101(num_classes):
-    model = timm.create_model('resnet101', pretrained=True, num_classes=num_classes)
+    model = timm.create_model('resnet101', pretrained=False, num_classes=num_classes)
     return model
 
 
 def InceptionV3(num_classes):
     # 载入预训练的 Inception 模型
-    model = timm.create_model('inception_v3', pretrained=True, num_classes=num_classes)
+    model = timm.create_model('inception_v3', pretrained=False, num_classes=num_classes)
     return model
 
 
 def EfficientNet(num_classes):
     # 载入预训练的 EfficientNet 模型
-    model = timm.create_model('efficientnet_b0', pretrained=True, num_classes=num_classes)
+    model = timm.create_model('efficientnet_b0', pretrained=False, num_classes=num_classes)
     return model
 
 
 def ViT(num_classes):
-    model = timm.create_model('vit_base_patch16_224', pretrained=True, num_classes=num_classes)
+    model = timm.create_model('vit_base_patch16_224', pretrained=False, num_classes=num_classes)
     return model
 
 
 def SwinTransformer(num_classes):
-    model = timm.create_model('swin_base_patch4_window12_384', pretrained=True, num_classes=num_classes)
+    model = timm.create_model('swin_base_patch4_window12_384', pretrained=False, num_classes=num_classes)
     return model
 
 
